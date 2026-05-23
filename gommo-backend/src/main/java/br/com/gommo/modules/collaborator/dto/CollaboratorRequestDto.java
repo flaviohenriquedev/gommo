@@ -1,7 +1,7 @@
-package br.com.gommo.modules.person.dto;
+package br.com.gommo.modules.collaborator.dto;
 
-import br.com.gommo.modules.person.entity.GenderEnum;
-import br.com.gommo.modules.person.entity.MaritalStatusEnum;
+import br.com.gommo.modules.collaborator.entity.GenderEnum;
+import br.com.gommo.modules.collaborator.entity.MaritalStatusEnum;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -17,7 +17,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PersonRequestDto {
+public class CollaboratorRequestDto {
 
     @NotBlank
     @Size(max = 200)

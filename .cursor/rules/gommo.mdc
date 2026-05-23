@@ -20,7 +20,7 @@ Monolito modular (bounded contexts), preparado para microserviços. **Nunca** de
 
 ## Módulos (nomes idênticos FE/BE)
 
-`root`, `person`, `employee`, `payroll`, `leave`, `benefit`, `attendance`, `contract`, `tax`, `performance`, `report`, `admission`
+`root`, `collaborator`, `payroll`, `leave`, `benefit`, `attendance`, `contract`, `tax`, `performance`, `report`, `admission`
 
 ## Backend — obrigatório
 
@@ -52,13 +52,13 @@ Monolito modular (bounded contexts), preparado para microserviços. **Nunca** de
 
 | Camada | Padrão |
 |--------|--------|
-| FE component | `PersonForm.tsx` |
-| FE hook | `usePerson.ts` |
-| FE service | `person.service.ts` |
-| BE entity | `Person.java` |
-| BE service | `PersonService.java` / `IPersonService.java` |
-| BE DTO | `PersonRequestDto.java` / `PersonResponseDto.java` |
-| BE use case | `CreatePersonUseCase.java` |
+| FE component | `CollaboratorForm.tsx` |
+| FE hook | `useCollaborator.ts` |
+| FE service | `collaborator.service.ts` |
+| BE entity | `Collaborator.java` |
+| BE service | `CollaboratorService.java` / `ICollaboratorService.java` |
+| BE DTO | `CollaboratorRequestDto.java` / `CollaboratorResponseDto.java` |
+| BE use case | `CreateCollaboratorUseCase.java` |
 
 ## Ao gerar código
 
@@ -71,4 +71,4 @@ Monolito modular (bounded contexts), preparado para microserviços. **Nunca** de
 
 ## Fase atual (01 — Fundação)
 
-Docker, bases genéricas, auth JWT/RBAC, Flyway, módulo Person, shell FE (login + sidebar + tema).
+Docker, bases genéricas, auth JWT/RBAC, Flyway, módulo Colaboradores, shell FE (login + sidebar + tema).

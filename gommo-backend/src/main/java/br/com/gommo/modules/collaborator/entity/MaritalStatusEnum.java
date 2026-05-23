@@ -1,4 +1,4 @@
-package br.com.gommo.modules.person.entity;
+package br.com.gommo.modules.collaborator.entity;
 
 public enum MaritalStatusEnum {
     SINGLE,

@@ -1,8 +1,8 @@
-package br.com.gommo.modules.person.dto;
+package br.com.gommo.modules.collaborator.dto;
 
 import br.com.gommo.core.entity.StatusEnum;
-import br.com.gommo.modules.person.entity.GenderEnum;
-import br.com.gommo.modules.person.entity.MaritalStatusEnum;
+import br.com.gommo.modules.collaborator.entity.GenderEnum;
+import br.com.gommo.modules.collaborator.entity.MaritalStatusEnum;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -11,7 +11,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class PersonResponseDto {
+public class CollaboratorResponseDto {
 
     private final UUID id;
     private final StatusEnum status;

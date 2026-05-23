@@ -1,15 +1,15 @@
-package br.com.gommo.modules.person.mapper;
+package br.com.gommo.modules.collaborator.mapper;
 
-import br.com.gommo.modules.person.dto.PersonRequestDto;
-import br.com.gommo.modules.person.dto.PersonResponseDto;
-import br.com.gommo.modules.person.entity.Person;
+import br.com.gommo.modules.collaborator.dto.CollaboratorRequestDto;
+import br.com.gommo.modules.collaborator.dto.CollaboratorResponseDto;
+import br.com.gommo.modules.collaborator.entity.Collaborator;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PersonMapper {
+public class CollaboratorMapper {
 
-    public Person toEntity(PersonRequestDto dto) {
-        return Person.builder()
+    public Collaborator toEntity(CollaboratorRequestDto dto) {
+        return Collaborator.builder()
                 .fullName(dto.getFullName())
                 .socialName(dto.getSocialName())
                 .cpf(dto.getCpf())
@@ -24,7 +24,7 @@ public class PersonMapper {
                 .build();
     }
 
-    public void updateEntity(Person entity, PersonRequestDto dto) {
+    public void updateEntity(Collaborator entity, CollaboratorRequestDto dto) {
         entity.setFullName(dto.getFullName());
         entity.setSocialName(dto.getSocialName());
         entity.setCpf(dto.getCpf());
@@ -40,8 +40,8 @@ public class PersonMapper {
         entity.setPisPasep(dto.getPisPasep());
     }
 
-    public PersonResponseDto toResponse(Person entity) {
-        return PersonResponseDto.builder()
+    public CollaboratorResponseDto toResponse(Collaborator entity) {
+        return CollaboratorResponseDto.builder()
                 .id(entity.getId())
                 .status(entity.getStatus())
                 .fullName(entity.getFullName())

@@ -28,8 +28,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class AppUser extends AuditEntity {
 
-    @Column(name = "person_id")
-    private UUID personId;
+    @Column(name = "collaborator_id")
+    private UUID collaboratorId;
 
     @Column(nullable = false, unique = true, length = 100)
     private String username;

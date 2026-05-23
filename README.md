@@ -48,7 +48,7 @@ https://unicode-table.com/pt/
 | É | U+00C9 | `\u00c9` |
 | Ê | U+00CA | `\u00ca` |
 | Ç | U+00C7 | `\u00c7` |
-| ã (maiúsculo raro) | U+00C3 | `\u00c3` |
+| Ã | U+00C3 | `\u00c3` |
 
 Exemplo no código:
 
@@ -57,7 +57,7 @@ public static final String MSG = "CPF j\u00e1 cadastrado";
 ```
 
 ```typescript
-PERSON_CPF_ALREADY_EXISTS: "CPF j\u00e1 cadastrado",
+PERSON_CPF_ALREADY_EXISTS: "CPF j\u00e1 cadastrado";
 ```
 
 ### Mapa de códigos de erro (`code`)
@@ -100,18 +100,18 @@ Resposta padrão da API (`4xx` / `5xx`):
 **Backend:** `gommo-backend/.../modules/root/exception/AuthExceptions.java`  
 **Frontend:** `gommo-frontend/src/modules/root/exceptions/auth.messages.ts`
 
-#### Person
+#### Colaboradores
 
 | Código | HTTP | Mensagem exibida |
 |--------|------|------------------|
-| `PERSON_NOT_FOUND` | 404 | Pessoa não encontrada |
-| `PERSON_CPF_ALREADY_EXISTS` | 409 | CPF já cadastrado |
+| `COLLABORATOR_NOT_FOUND` | 404 | Colaborador não encontrado |
+| `COLLABORATOR_CPF_ALREADY_EXISTS` | 409 | CPF já cadastrado |
 | `CPF_ALREADY_EXISTS` | — | CPF já cadastrado *(alias legado no frontend)* |
-| `PERSON_LOAD_FAILED` | — | Não foi possível carregar a pessoa *(somente frontend)* |
-| `PERSON_SAVE_FAILED` | — | Não foi possível salvar a pessoa *(somente frontend)* |
+| `COLLABORATOR_LOAD_FAILED` | — | Não foi possível carregar o colaborador *(somente frontend)* |
+| `COLLABORATOR_SAVE_FAILED` | — | Não foi possível salvar o colaborador *(somente frontend)* |
 
-**Backend:** `gommo-backend/.../modules/person/exception/PersonExceptions.java`  
-**Frontend:** `gommo-frontend/src/modules/person/exceptions/person.messages.ts`
+**Backend:** `gommo-backend/.../modules/collaborator/exception/CollaboratorExceptions.java`  
+**Frontend:** `gommo-frontend/src/modules/collaborator/exceptions/collaborator.messages.ts`
 
 ### Onde implementar
 

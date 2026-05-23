@@ -1,4 +1,4 @@
-package br.com.gommo.modules.person.entity;
+package br.com.gommo.modules.collaborator.entity;
 
 import br.com.gommo.core.entity.AuditEntity;
 import jakarta.persistence.Column;
@@ -16,13 +16,13 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 @Entity
-@Table(name = "person")
+@Table(name = "collaborator")
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Person extends AuditEntity {
+public class Collaborator extends AuditEntity {
 
     @Column(name = "full_name", nullable = false, length = 200)
     private String fullName;

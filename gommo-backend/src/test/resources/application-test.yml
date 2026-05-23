@@ -1,8 +1,10 @@
 spring:
+  config:
+    import: optional:file:../.env[.properties],optional:file:.env[.properties]
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:gommo}
     username: ${DB_USER:gommo}
-    password: ${DB_PASSWORD}
+    password: ${DB_PASSWORD:gommo_dev}
   flyway:
     enabled: true
   jpa:
@@ -19,4 +21,4 @@ gommo:
     allowed-origins: http://localhost:3000
   dev:
     admin-username: admin
-    admin-password: ${TEST_ADMIN_PASSWORD:test-integration-password}
+    admin-password: ${DEV_ADMIN_PASSWORD:${TEST_ADMIN_PASSWORD:test-integration-password}}

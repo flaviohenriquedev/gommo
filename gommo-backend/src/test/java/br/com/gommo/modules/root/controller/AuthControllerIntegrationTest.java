@@ -10,7 +10,7 @@ class AuthControllerIntegrationTest extends AbstractIntegrationTest {
     @Test
     void login_shouldReturnTokensForAdmin() throws Exception {
         var body =
-                "{\"username\":\"%s\",\"password\":\"%s\"}".formatted(TEST_ADMIN_USERNAME, TEST_ADMIN_PASSWORD);
+                "{\"username\":\"%s\",\"password\":\"%s\"}".formatted(TEST_ADMIN_USERNAME, testAdminPassword);
         var response = postJson("/api/v1/auth/login", body, null);
 
         assertThat(response.statusCode()).isEqualTo(200);

@@ -7,6 +7,7 @@ import java.net.http.HttpResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
@@ -20,8 +21,12 @@ import org.springframework.test.context.ActiveProfiles;
 public abstract class AbstractIntegrationTest {
 
     protected static final String TEST_ADMIN_USERNAME = "admin";
-    protected static final String TEST_ADMIN_PASSWORD =
-            System.getenv().getOrDefault("TEST_ADMIN_PASSWORD", "test-integration-password");
+
+    @Value("${gommo.dev.admin-password}")
+    private String configuredAdminPassword;
+
+    /** Senha do admin no banco (mesma resolução do application-test.yml / .env). */
+    protected String testAdminPassword;
 
     @LocalServerPort
     protected int port;
@@ -36,6 +41,7 @@ public abstract class AbstractIntegrationTest {
     void setupHttp() {
         httpClient = injectedClient != null ? injectedClient : HttpClient.newHttpClient();
         baseUrl = "http://localhost:" + port;
+        testAdminPassword = configuredAdminPassword;
     }
 
     protected HttpResponse<String> postJson(String path, String json, String bearerToken) throws Exception {
