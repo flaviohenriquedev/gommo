@@ -1,4 +1,5 @@
 import {apiFetch} from "@/shared/lib/api.client";
+import type {PageableResponseDto} from "@/shared/dto/pageable.dto";
 
 export abstract class BaseService<T, CreateDto = Partial<T>, UpdateDto = Partial<T>> {
     constructor(protected readonly basePath: string) {
@@ -22,5 +23,9 @@ export abstract class BaseService<T, CreateDto = Partial<T>, UpdateDto = Partial
 
     remove(id: string): Promise<void> {
         return apiFetch<void>(`${this.basePath}/${id}`, {method: "DELETE"});
+    }
+
+    getPage(page = 0, size = 20): Promise<PageableResponseDto<T>> {
+        return apiFetch<PageableResponseDto<T>>(`${this.basePath}/page?page=${page}&size=${size}`);
     }
 }

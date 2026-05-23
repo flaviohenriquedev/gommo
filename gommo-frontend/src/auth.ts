@@ -1,5 +1,9 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import {
+  isAccessTokenExpired,
+  refreshAccessToken,
+} from "@/auth/refresh-token";
 import { apiFetch, setAuthToken } from "@/shared/lib/api.client";
 
 class TokenResponse {
@@ -34,6 +38,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             name: credentials.username as string,
             accessToken: data.accessToken,
             refreshToken: data.refreshToken,
+            accessTokenExpires: Date.now() + data.expiresInSeconds * 1000,
           };
         } catch {
           return null;
@@ -53,14 +58,31 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async jwt({ token, user }) {
       if (user) {
-        token.accessToken = user.accessToken;
-        token.refreshToken = user.refreshToken;
+        return {
+          ...token,
+          sub: user.id,
+          accessToken: user.accessToken,
+          refreshToken: user.refreshToken,
+          accessTokenExpires: user.accessTokenExpires,
+          error: undefined,
+        };
       }
-      return token;
+
+      if (!isAccessTokenExpired(token)) {
+        return token;
+      }
+
+      return refreshAccessToken(token);
     },
     async session({ session, token }) {
-      session.accessToken = token.accessToken as string;
-      session.refreshToken = token.refreshToken as string;
+      session.accessToken = token.accessToken as string | undefined;
+      session.refreshToken = token.refreshToken as string | undefined;
+      session.error = token.error as typeof session.error;
+
+      if (token.error) {
+        session.accessToken = undefined;
+      }
+
       return session;
     },
   },
