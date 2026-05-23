@@ -1,7 +1,7 @@
 package br.com.gommo.modules.root.service;
 
 import br.com.gommo.core.entity.StatusEnum;
-import br.com.gommo.core.exception.BusinessException;
+import br.com.gommo.modules.root.exception.AuthException;
 import br.com.gommo.core.security.JwtProperties;
 import br.com.gommo.core.security.JwtService;
 import br.com.gommo.modules.root.dto.LoginRequestDto;
@@ -74,20 +74,20 @@ public class AuthService implements IAuthService {
     public TokenResponseDto refresh(RefreshTokenRequestDto request) {
         String rawRefresh = request.getRefreshToken();
         if (!jwtService.isRefreshToken(rawRefresh)) {
-            throw new BusinessException("INVALID_REFRESH", "Invalid refresh token");
+            throw AuthException.invalidRefresh();
         }
 
         String tokenHash = hashToken(rawRefresh);
         if (blacklistRepository.existsByTokenHash(tokenHash)) {
-            throw new BusinessException("REVOKED_REFRESH", "Refresh token has been revoked");
+            throw AuthException.revokedRefresh();
         }
 
         RefreshToken stored = refreshTokenRepository
                 .findByTokenHashAndRevokedFalse(tokenHash)
-                .orElseThrow(() -> new BusinessException("INVALID_REFRESH", "Refresh token not found"));
+                .orElseThrow(AuthException::invalidRefresh);
 
         if (stored.getExpiresAt().isBefore(OffsetDateTime.now())) {
-            throw new BusinessException("EXPIRED_REFRESH", "Refresh token expired");
+            throw AuthException.expiredRefresh();
         }
 
         stored.setRevoked(true);
@@ -99,9 +99,8 @@ public class AuthService implements IAuthService {
 
         UUID userId = jwtService.extractUserId(rawRefresh);
         AppUser user = appUserRepository
-                .findById(userId)
-                .filter(u -> u.getStatus() != StatusEnum.DELETED)
-                .orElseThrow(() -> new BusinessException("USER_NOT_FOUND", "User not found"));
+                .findActiveByIdWithRoles(userId, StatusEnum.DELETED)
+                .orElseThrow(AuthException::userNotFound);
 
         return buildTokenResponse(user);
     }

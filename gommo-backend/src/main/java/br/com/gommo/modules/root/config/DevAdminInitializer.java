@@ -5,6 +5,7 @@ import br.com.gommo.modules.root.entity.AppUser;
 import br.com.gommo.modules.root.entity.Role;
 import br.com.gommo.modules.root.repository.AppUserRepository;
 import br.com.gommo.modules.root.repository.RoleRepository;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -51,10 +52,30 @@ public class DevAdminInitializer implements ApplicationRunner {
                             + "Defina DEV_ADMIN_PASSWORD (veja .env.example).");
             return;
         }
-        if (appUserRepository.existsByUsername(devAdminUsername)) {
+
+        Role adminRole = roleRepository.findById(ADMIN_ROLE_ID).orElseThrow();
+
+        appUserRepository
+                .findActiveByUsername(devAdminUsername, StatusEnum.DELETED)
+                .ifPresentOrElse(
+                        user -> ensureAdminRole(user, adminRole),
+                        () -> createAdmin(adminRole));
+    }
+
+    private void ensureAdminRole(AppUser user, Role adminRole) {
+        Set<Role> roles = new HashSet<>(user.getRoles());
+        if (roles.contains(adminRole)) {
             return;
         }
-        Role adminRole = roleRepository.findById(ADMIN_ROLE_ID).orElseThrow();
+        roles.add(adminRole);
+        user.setRoles(roles);
+        appUserRepository.save(user);
+        log.warn(
+                "Usuario '{}' existia sem role ADMIN; role vinculada. Faca login novamente para atualizar o token.",
+                user.getUsername());
+    }
+
+    private void createAdmin(Role adminRole) {
         AppUser admin = AppUser.builder()
                 .username(devAdminUsername)
                 .email("admin@gommo.local")
