@@ -1,6 +1,8 @@
 package br.com.gommo.core.exception;
 
 import br.com.gommo.core.security.CorrelationIdFilter;
+import br.com.gommo.modules.root.exception.AuthException;
+import br.com.gommo.modules.root.exception.AuthExceptions;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.OffsetDateTime;
 import org.slf4j.Logger;
@@ -21,27 +23,41 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponseDto> handleBusiness(BusinessException ex, HttpServletRequest request) {
-        return ResponseEntity.badRequest().body(error(ex.getCode(), ex.getMessage(), request));
+        return ResponseEntity.status(ex.getStatus())
+                .body(error(ex.getCode(), ex.getMessage(), request));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponseDto> handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponseDto> handleValidation(
+            MethodArgumentNotValidException ex, HttpServletRequest request) {
         FieldError fieldError = ex.getBindingResult().getFieldError();
-        String message = fieldError != null ? fieldError.getField() + ": " + fieldError.getDefaultMessage() : "Validation failed";
-        return ResponseEntity.badRequest().body(error("VALIDATION_ERROR", message, request));
+        String detail = fieldError != null ? fieldError.getField() + ": " + fieldError.getDefaultMessage() : "";
+        String message = CoreException.validation(detail).getMessage();
+        return ResponseEntity.badRequest()
+                .body(error(CoreExceptions.VALIDATION_ERROR_CODE, message, request));
     }
 
-    @ExceptionHandler({BadCredentialsException.class, AccessDeniedException.class})
-    public ResponseEntity<ErrorResponseDto> handleSecurity(RuntimeException ex, HttpServletRequest request) {
-        HttpStatus status = ex instanceof AccessDeniedException ? HttpStatus.FORBIDDEN : HttpStatus.UNAUTHORIZED;
-        return ResponseEntity.status(status).body(error("AUTH_ERROR", ex.getMessage(), request));
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponseDto> handleBadCredentials(
+            BadCredentialsException ex, HttpServletRequest request) {
+        BusinessException mapped = AuthException.invalidCredentials();
+        return ResponseEntity.status(mapped.getStatus())
+                .body(error(mapped.getCode(), mapped.getMessage(), request));
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponseDto> handleAccessDenied(
+            AccessDeniedException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(error(CoreExceptions.FORBIDDEN_CODE, CoreExceptions.FORBIDDEN_MSG, request));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleGeneric(Exception ex, HttpServletRequest request) {
         log.error("Unhandled error path={}", request.getRequestURI(), ex);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(error("INTERNAL_ERROR", "An unexpected error occurred", request));
+        BusinessException mapped = CoreException.internal();
+        return ResponseEntity.status(mapped.getStatus())
+                .body(error(mapped.getCode(), mapped.getMessage(), request));
     }
 
     private ErrorResponseDto error(String code, String message, HttpServletRequest request) {

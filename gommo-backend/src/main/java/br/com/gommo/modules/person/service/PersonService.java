@@ -3,7 +3,7 @@ package br.com.gommo.modules.person.service;
 import br.com.gommo.core.base.dto.PageableResponseDto;
 import br.com.gommo.core.base.service.BaseService;
 import br.com.gommo.core.entity.StatusEnum;
-import br.com.gommo.core.exception.BusinessException;
+import br.com.gommo.modules.person.exception.PersonException;
 import br.com.gommo.modules.person.dto.PersonRequestDto;
 import br.com.gommo.modules.person.dto.PersonResponseDto;
 import br.com.gommo.modules.person.entity.Person;
@@ -22,12 +22,7 @@ public class PersonService extends BaseService<Person, PersonRequestDto, PersonR
     private final PersonMapper personMapper;
 
     public PersonService(PersonRepository personRepository, PersonMapper personMapper) {
-        super(
-                personRepository,
-                personMapper::toResponse,
-                personMapper::toEntity,
-                "PERSON_NOT_FOUND",
-                "Person not found");
+        super(personRepository, personMapper::toResponse, personMapper::toEntity);
         this.personRepository = personRepository;
         this.personMapper = personMapper;
     }
@@ -60,7 +55,7 @@ public class PersonService extends BaseService<Person, PersonRequestDto, PersonR
         personRepository
                 .findByCpfAndStatusNot(request.getCpf(), StatusEnum.DELETED)
                 .ifPresent(p -> {
-                    throw new BusinessException("CPF_ALREADY_EXISTS", "CPF already registered");
+                    throw PersonException.cpfAlreadyExists();
                 });
         return super.create(request);
     }
@@ -73,7 +68,7 @@ public class PersonService extends BaseService<Person, PersonRequestDto, PersonR
                 .findByCpfAndStatusNot(request.getCpf(), StatusEnum.DELETED)
                 .filter(existing -> !existing.getId().equals(id))
                 .ifPresent(p -> {
-                    throw new BusinessException("CPF_ALREADY_EXISTS", "CPF already registered");
+                    throw PersonException.cpfAlreadyExists();
                 });
         return super.update(id, request);
     }
@@ -83,6 +78,13 @@ public class PersonService extends BaseService<Person, PersonRequestDto, PersonR
     @PreAuthorize("hasAuthority('person:delete')")
     public void delete(UUID id) {
         super.delete(id);
+    }
+
+    @Override
+    protected Person findEntity(UUID id) {
+        return personRepository
+                .findByIdAndStatusNot(id, StatusEnum.DELETED)
+                .orElseThrow(PersonException::notFound);
     }
 
     @Override

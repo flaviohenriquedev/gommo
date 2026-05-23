@@ -11,6 +11,7 @@ import java.util.function.Function;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 
 public abstract class BaseService<T extends AuditEntity, RequestDto, ResponseDto>
@@ -21,6 +22,13 @@ public abstract class BaseService<T extends AuditEntity, RequestDto, ResponseDto
     private final Function<RequestDto, T> toEntity;
     private final String notFoundCode;
     private final String notFoundMessage;
+
+    protected BaseService(
+            IBaseRepository<T> repository,
+            Function<T, ResponseDto> toResponse,
+            Function<RequestDto, T> toEntity) {
+        this(repository, toResponse, toEntity, null, null);
+    }
 
     protected BaseService(
             IBaseRepository<T> repository,
@@ -92,7 +100,15 @@ public abstract class BaseService<T extends AuditEntity, RequestDto, ResponseDto
     protected abstract void updateEntity(T entity, RequestDto request);
 
     protected T findEntity(UUID id) {
-        return repository.findByIdAndStatusNot(id, StatusEnum.DELETED)
-                .orElseThrow(() -> new BusinessException(notFoundCode, notFoundMessage));
+        return repository
+                .findByIdAndStatusNot(id, StatusEnum.DELETED)
+                .orElseThrow(this::entityNotFound);
+    }
+
+    protected RuntimeException entityNotFound() {
+        if (notFoundCode != null && notFoundMessage != null) {
+            return new BusinessException(notFoundCode, notFoundMessage, HttpStatus.NOT_FOUND);
+        }
+        throw new IllegalStateException("findEntity() must be overridden or notFoundCode/message provided");
     }
 }
