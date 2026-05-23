@@ -41,3 +41,13 @@ Perfil `dev`: cria usuário admin se `DEV_ADMIN_PASSWORD` estiver definido (veja
 - `GET /actuator/health`
 
 API local: http://localhost:8081
+
+## Exceções
+
+Catálogo de códigos, mapa de caracteres Unicode e conversor: **[README do monorepo](../README.md#exceções-e-mensagens)**.
+
+Arquivos deste projeto:
+
+- `src/main/java/br/com/gommo/core/exception/` — núcleo e `GlobalExceptionHandler`
+- `src/main/java/br/com/gommo/modules/person/exception/` — Person
+- `src/main/java/br/com/gommo/modules/root/exception/` — Auth
