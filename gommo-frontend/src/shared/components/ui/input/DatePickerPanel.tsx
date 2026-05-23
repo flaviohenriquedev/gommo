@@ -2,7 +2,7 @@
 
 import { DayPicker } from "react-day-picker";
 import { ptBR } from "react-day-picker/locale";
-import { forwardRef, useEffect, useLayoutEffect, useState } from "react";
+import { forwardRef, useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { dateToIso, parseIsoToDate } from "@/shared/lib/input/date";
 
@@ -16,22 +16,21 @@ type DatePickerPanelProps = {
 
 export const DatePickerPanel = forwardRef<HTMLDivElement, DatePickerPanelProps>(
   function DatePickerPanel({ value, min, max, onPick, anchorRef }, ref) {
-    const [position, setPosition] = useState({ top: 0, left: 0, width: 300 });
+    const [position, setPosition] = useState({ top: 0, left: 0 });
 
-    const updatePosition = () => {
+    const updatePosition = useCallback(() => {
       const anchor = anchorRef.current;
       if (!anchor) return;
       const rect = anchor.getBoundingClientRect();
       setPosition({
         top: rect.bottom + 6,
         left: rect.left,
-        width: Math.max(rect.width, 300),
       });
-    };
+    }, [anchorRef]);
 
     useLayoutEffect(() => {
       updatePosition();
-    }, [anchorRef]);
+    }, [updatePosition]);
 
     useEffect(() => {
       updatePosition();
@@ -41,7 +40,7 @@ export const DatePickerPanel = forwardRef<HTMLDivElement, DatePickerPanelProps>(
         window.removeEventListener("resize", updatePosition);
         window.removeEventListener("scroll", updatePosition, true);
       };
-    }, [anchorRef]);
+    }, [updatePosition]);
 
     if (typeof document === "undefined") return null;
 
@@ -56,7 +55,7 @@ export const DatePickerPanel = forwardRef<HTMLDivElement, DatePickerPanelProps>(
         style={{
           top: position.top,
           left: position.left,
-          width: position.width,
+          width: "max-content",
         }}
         role="dialog"
         aria-label="Calendário"

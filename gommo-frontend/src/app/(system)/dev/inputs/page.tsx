@@ -7,7 +7,7 @@ export default function DevInputsPage() {
     <PageTransition>
       <PageHeader
         title="Laboratório de inputs"
-        description="Teste InputBase, campos tipados, InputSelect, InputAutocomplete e o híbrido com dados de Person."
+        description="Teste InputBase, campos tipados, InputSelect, InputAutocomplete e o híbrido com dados de Colaboradores."
       />
       <InputsPlaygroundClient />
     </PageTransition>

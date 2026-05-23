@@ -6,8 +6,8 @@ import {Card} from "@/shared/components/ui/Card";
 import {Button} from "@/shared/components/ui/Button";
 
 const metrics = [
-    {label: "Pessoas", value: "—", delta: "+12%", icon: Users},
-    {label: "Funcionários", value: "—", delta: "+4%", icon: LayoutDashboard},
+    {label: "Colaboradores", value: "—", delta: "+4%", icon: Users},
+    {label: "Contratos ativos", value: "—", delta: "+12%", icon: LayoutDashboard},
     {label: "Folha aberta", value: "—", delta: "Em dia", icon: Wallet},
     {label: "Férias pendentes", value: "—", delta: "3 itens", icon: Palmtree},
 ] as const;
@@ -19,7 +19,7 @@ export default function DashboardPage() {
                 badge="Fase 01"
                 title="Dashboard"
                 description="Visão consolidada do departamento pessoal em tempo real."
-                actions={<Button size="sm">Exportar relatório</Button>}
+                actions={<Button>Exportar relatório</Button>}
             />
 
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -37,7 +37,7 @@ export default function DashboardPage() {
                                     </p>
                                 </div>
                                 <span
-                                    className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-base-200/80 text-base-content/50">
+                                    className="flex size-11 shrink-0 items-center justify-center rounded-[10px] bg-digital-blue-50 text-digital-blue-600">
                   <Icon className="size-5" strokeWidth={1.75}/>
                 </span>
                             </div>
@@ -58,7 +58,7 @@ export default function DashboardPage() {
                         {[38, 62, 44, 78, 52, 88, 70].map((h, i) => (
                             <div key={i} className="flex flex-1 flex-col items-center gap-2">
                                 <div
-                                    className="w-full max-w-10 rounded-t-lg bg-base-content/85 transition-all duration-500"
+                                    className="w-full max-w-10 rounded-t-[10px] bg-digital-blue-500 transition-all duration-500"
                                     style={{height: `${h}%`}}
                                 />
                             </div>
@@ -77,12 +77,12 @@ export default function DashboardPage() {
                         </div>
                         <div className="w-full space-y-3">
                             <div
-                                className="flex items-center justify-between rounded-lg bg-base-200/70 px-3 py-2.5 text-xs">
+                                className="flex items-center justify-between rounded-[10px] bg-digital-blue-50/80 px-3 py-2.5 text-xs">
                                 <span className="font-medium text-base-content/60">Módulos ativos</span>
                                 <span className="font-bold">12</span>
                             </div>
                             <div
-                                className="flex items-center justify-between rounded-lg bg-primary/10 px-3 py-2.5 text-xs">
+                                className="flex items-center justify-between rounded-[10px] border border-digital-blue-200 bg-digital-blue-50 px-3 py-2.5 text-xs">
                                 <span className="font-medium text-base-content/70">Performance</span>
                                 <span className="inline-flex items-center gap-0.5 font-bold text-primary">
                   Alta

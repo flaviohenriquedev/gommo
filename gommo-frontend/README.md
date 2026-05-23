@@ -19,5 +19,5 @@ Catálogo de códigos, mapa de caracteres Unicode e conversor: **[README do mono
 Arquivos deste projeto:
 
 - `src/shared/exceptions/` — `AppException`, `ExceptionCapture`, `message-registry`
-- `src/modules/person/exceptions/` — Person
+- `src/modules/collaborator/exceptions/` — Colaboradores
 - `src/modules/root/exceptions/` — Auth

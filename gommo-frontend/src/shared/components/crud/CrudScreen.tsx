@@ -37,9 +37,7 @@ const CrudScreenContext = createContext<CrudScreenContextValue | null>(null);
 
 export function useCrudScreen(): CrudScreenContextValue {
   const ctx = useContext(CrudScreenContext);
-  if (!ctx) {
-    throw new Error("useCrudScreen deve ser usado dentro de CrudScreen");
-  }
+  if (!ctx) throw new Error("useCrudScreen deve ser usado dentro de CrudScreen");
   return ctx;
 }
 
@@ -85,36 +83,14 @@ export function CrudScreen({
     [activeTab, extraTabs, formTabLabel, formTabLabelEdit, isEditing, listTabLabel],
   );
 
-  const goToList = useCallback(() => {
-    setEditingId(null);
-    setActiveTab(CRUD_TAB_LIST);
-  }, []);
-
+  const goToList = useCallback(() => { setEditingId(null); setActiveTab(CRUD_TAB_LIST); }, []);
   const goToForm = useCallback(() => setActiveTab(CRUD_TAB_FORM), []);
-
-  const startCreate = useCallback(() => {
-    setEditingId(null);
-    setActiveTab(CRUD_TAB_FORM);
-  }, []);
-
-  const startEdit = useCallback((id: string) => {
-    setEditingId(id);
-    setActiveTab(CRUD_TAB_FORM);
-  }, []);
-
+  const startCreate = useCallback(() => { setEditingId(null); setActiveTab(CRUD_TAB_FORM); }, []);
+  const startEdit = useCallback((id: string) => { setEditingId(id); setActiveTab(CRUD_TAB_FORM); }, []);
   const goToTab = useCallback((tabId: string) => setActiveTab(tabId), []);
 
   const ctx = useMemo(
-    () => ({
-      activeTab,
-      editingId,
-      isEditing,
-      goToList,
-      goToForm,
-      startCreate,
-      startEdit,
-      goToTab,
-    }),
+    () => ({ activeTab, editingId, isEditing, goToList, goToForm, startCreate, startEdit, goToTab }),
     [activeTab, editingId, goToForm, goToList, goToTab, isEditing, startCreate, startEdit],
   );
 
@@ -128,8 +104,10 @@ export function CrudScreen({
   return (
     <CrudScreenContext.Provider value={ctx}>
       <div className="flex flex-col">
+
+        {/* ── Tab bar ── */}
         <div
-          className="flex gap-1 overflow-x-auto border-b border-base-300/60 px-4 pt-1"
+          className="flex items-center gap-0.5 overflow-x-auto overflow-y-hidden border-b border-digital-blue-100/70 px-4 pt-0.5"
           role="tablist"
           aria-label="Seções do cadastro"
         >
@@ -145,18 +123,18 @@ export function CrudScreen({
                 id={`crud-tab-${tab.id}`}
                 onClick={() => setActiveTab(tab.id)}
                 className={clsx(
-                  "relative shrink-0 px-3 py-2.5 text-sm font-semibold tracking-tight transition-colors",
+                  "relative shrink-0 rounded-t-[6px] px-3 py-2 text-[13px] transition-colors duration-150",
                   selected
-                    ? "text-primary"
-                    : "text-base-content/45 hover:text-base-content/75",
+                    ? "font-semibold text-digital-blue-600"
+                    : "font-medium text-base-content/40 hover:text-base-content/70",
                 )}
               >
                 {tab.label}
                 {selected && (
                   <motion.span
                     layoutId="crud-tab-indicator"
-                    className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-primary"
-                    transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute inset-x-1.5 -bottom-px h-[2px] rounded-full bg-digital-blue-500"
+                    transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                   />
                 )}
               </button>
@@ -164,6 +142,7 @@ export function CrudScreen({
           })}
         </div>
 
+        {/* ── Panel ── */}
         <div
           id={`crud-panel-${activeTab}`}
           role="tabpanel"
@@ -171,16 +150,14 @@ export function CrudScreen({
           className="min-h-[12rem]"
         >
           {activeTab === CRUD_TAB_LIST && (
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-base-300/40 px-4 py-3">
-              {listToolbar ?? (
-                <p className="text-sm text-base-content/50">
-                  Consulte os registros ou inicie um novo cadastro.
-                </p>
-              )}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-digital-blue-100/50 bg-digital-blue-50/30 px-4 py-2.5">
+              <div className="text-[13px] text-base-content/45">
+                {listToolbar ?? "Consulte os registros ou inicie um novo cadastro."}
+              </div>
               {showListToFormButton && (
                 <Button
                   size="sm"
-                  leftIcon={<Plus className="size-3.5" />}
+                  leftIcon={<Plus className="size-3.5" strokeWidth={2.5} />}
                   onClick={startCreate}
                 >
                   {listToFormLabel}

@@ -3,47 +3,47 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {Pencil, Trash2} from "lucide-react";
 import {toast} from "sonner";
-import {PERSON_CLIENT_MESSAGES} from "@/modules/person/exceptions/person.messages";
-import {PERSON_TABLE_COLUMNS} from "@/modules/person/config/person.table-columns";
-import type {Person} from "@/modules/person/dto/person.dto";
-import {personKeys} from "@/modules/person/person.query";
-import {personService} from "@/modules/person/services/person.service";
+import {COLLABORATOR_CLIENT_MESSAGES} from "@/modules/collaborator/exceptions/collaborator.messages";
+import {COLLABORATOR_TABLE_COLUMNS} from "@/modules/collaborator/config/collaborator.table-columns";
+import type {Collaborator} from "@/modules/collaborator/dto/collaborator.dto";
+import {collaboratorKeys} from "@/modules/collaborator/collaborator.query";
+import {collaboratorService} from "@/modules/collaborator/services/collaborator.service";
 import {useCrudScreen} from "@/shared/components/crud/CrudScreen";
 import {QueryPanel} from "@/shared/components/data/DataPanel";
 import {Button} from "@/shared/components/ui/Button";
 import {DataTable} from "@/shared/components/ui/DataTable";
 import {ExceptionCapture} from "@/shared/exceptions";
 
-export function PersonListClient() {
+export function CollaboratorListClient() {
     const {startEdit} = useCrudScreen();
     const queryClient = useQueryClient();
 
     const deleteMutation = useMutation({
-        mutationFn: (id: string) => personService.remove(id),
+        mutationFn: (id: string) => collaboratorService.remove(id),
         onSuccess: async () => {
-            await queryClient.invalidateQueries({queryKey: personKeys.all});
-            toast.success("Pessoa excluída");
+            await queryClient.invalidateQueries({queryKey: collaboratorKeys.all});
+            toast.success("Colaborador excluído");
         },
         onError: (err: unknown) =>
-            ExceptionCapture.handle(err, {fallbackMessage: PERSON_CLIENT_MESSAGES.PERSON_LOAD_FAILED}),
+            ExceptionCapture.handle(err, {fallbackMessage: COLLABORATOR_CLIENT_MESSAGES.COLLABORATOR_LOAD_FAILED}),
     });
 
-    const handleDelete = (person: Person) => {
+    const handleDelete = (collaborator: Collaborator) => {
         const confirmed = window.confirm(
-            `Excluir "${person.fullName}"? Esta ação não pode ser desfeita.`,
+            `Excluir "${collaborator.fullName}"? Esta ação não pode ser desfeita.`,
         );
         if (!confirmed) return;
-        deleteMutation.mutate(person.id);
+        deleteMutation.mutate(collaborator.id);
     };
 
     return (
-        <QueryPanel queryKey={personKeys.all} request={() => personService.getAll()}>
+        <QueryPanel queryKey={collaboratorKeys.all} request={() => collaboratorService.getAll()}>
             {({data}) => (
-                <DataTable<Person>
+                <DataTable<Collaborator>
                     data={data}
-                    columns={PERSON_TABLE_COLUMNS}
+                    columns={COLLABORATOR_TABLE_COLUMNS}
                     rowKey="id"
-                    emptyMessage="Nenhuma pessoa cadastrada."
+                    emptyMessage="Nenhuma Colaborador cadastrado."
                     onRowClick={(row) => startEdit(row.id)}
                     renderActions={(row) => (
                         <>

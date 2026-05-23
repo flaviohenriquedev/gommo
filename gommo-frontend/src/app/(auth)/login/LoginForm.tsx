@@ -59,7 +59,7 @@ export function LoginForm() {
         required
       />
 
-      <Button type="submit" className="mt-1 w-full" size="lg" loading={loading}>
+      <Button type="submit" className="gommo-btn--block mt-1" loading={loading}>
         Entrar
       </Button>
 

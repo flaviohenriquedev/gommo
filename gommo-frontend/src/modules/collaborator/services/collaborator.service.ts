@@ -1,15 +1,15 @@
-import type { Person } from "@/modules/person/dto/person.dto";
+import type { Collaborator } from "@/modules/collaborator/dto/collaborator.dto";
 import { BaseService } from "@/modules/root/services/base.service";
-import type { PersonCreateDto } from "@/modules/person/dto/person.dto";
+import type { CollaboratorCreateDto } from "@/modules/collaborator/dto/collaborator.dto";
 import type { SelectItem, SelectSearchResult } from "@/shared/components/ui/input/select-item.types";
 import { maskCpf } from "@/shared/lib/input/cpf";
 import { digitsOnly } from "@/shared/lib/input/digits";
 
 const AUTOCOMPLETE_PAGE_SIZE = 6;
 
-class PersonService extends BaseService<Person, PersonCreateDto, PersonCreateDto> {
+class CollaboratorService extends BaseService<Collaborator, CollaboratorCreateDto, CollaboratorCreateDto> {
   constructor() {
-    super("/api/v1/persons");
+    super("/api/v1/collaborators");
   }
 
   /** Busca paginada para autocomplete (máx. 6 por página). Filtra em memória até termos endpoint de busca no backend. */
@@ -45,4 +45,4 @@ class PersonService extends BaseService<Person, PersonCreateDto, PersonCreateDto
   }
 }
 
-export const personService = new PersonService();
+export const collaboratorService = new CollaboratorService();

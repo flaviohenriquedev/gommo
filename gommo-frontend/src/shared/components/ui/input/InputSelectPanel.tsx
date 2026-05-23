@@ -30,7 +30,7 @@ export function InputSelectPanel({
     return (
         <div
             className={clsx(
-                "absolute z-50 mt-1 w-full overflow-hidden rounded-xl border border-base-300/80 bg-base-100 shadow-lg shadow-base-content/5",
+                "absolute z-50 mt-1 w-full overflow-hidden rounded-[10px] border border-digital-blue-200/80 bg-base-100 shadow-lg shadow-digital-blue-500/8",
                 className,
             )}
         >
@@ -51,8 +51,8 @@ export function InputSelectPanel({
                                 className={clsx(
                                     "flex cursor-pointer items-start gap-2 px-3 py-2 text-sm transition-colors",
                                     item.disabled && "pointer-events-none opacity-45",
-                                    active && "bg-primary/10 text-primary",
-                                    !active && "hover:bg-base-200",
+                                    active && "bg-digital-blue-50 text-digital-blue-700",
+                                    !active && "hover:bg-digital-blue-50/60",
                                 )}
                                 onMouseEnter={() => onHighlight(index)}
                                 onMouseDown={(e) => e.preventDefault()}
@@ -66,7 +66,7 @@ export function InputSelectPanel({
                     </span>
                     )}
                 </span>
-                                {selected && <Check className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden/>}
+                                {selected && <Check className="mt-0.5 size-4 shrink-0 text-digital-blue-600" aria-hidden/>}
                             </li>
                         );
                     })}

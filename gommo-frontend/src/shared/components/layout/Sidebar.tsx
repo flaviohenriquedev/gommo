@@ -1,300 +1,411 @@
 "use client";
 
 import clsx from "clsx";
-import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import {AnimatePresence, motion} from "framer-motion";
+import {ChevronLeft, ChevronRight, Search} from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { APP_ROUTES, NAV_SECTIONS, flattenRoutes, type AppRoute } from "@/config/routes";
-import { SidebarFlyout } from "@/shared/components/layout/SidebarFlyout";
+import {usePathname} from "next/navigation";
+import {useEffect, useMemo, useRef, useState} from "react";
+import {APP_ROUTES, type AppRoute, flattenRoutes, NAV_SECTIONS} from "@/config/routes";
+import {SidebarFlyout} from "@/shared/components/layout/SidebarFlyout";
 
 type SidebarProps = {
-  collapsed: boolean;
-  onToggle: () => void;
-  mobileOpen?: boolean;
-  onMobileClose?: () => void;
+    collapsed: boolean;
+    onToggleAction: () => void;
+    mobileOpen?: boolean;
+    onMobileCloseAction?: () => void;
 };
 
 function routeIsActive(route: AppRoute, pathname: string): boolean {
-  if (route.href === pathname) return true;
-  return route.children?.some((c) => c.href === pathname) ?? false;
+    if (route.href === pathname) return true;
+    return route.children?.some((c) => c.href === pathname) ?? false;
 }
 
-export function Sidebar({ collapsed, onToggle, mobileOpen = false, onMobileClose }: SidebarProps) {
-  const pathname = usePathname();
-  const [query, setQuery] = useState("");
-  const [openIds, setOpenIds] = useState<Set<string>>(new Set());
-  const [flyout, setFlyout] = useState<{ route: AppRoute; top: number } | null>(null);
+export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobileCloseAction}: SidebarProps) {
+    const pathname = usePathname();
+    const [query, setQuery] = useState("");
+    const [openIds, setOpenIds] = useState<Set<string>>(new Set());
+    const [flyout, setFlyout] = useState<{ route: AppRoute; top: number } | null>(null);
+    const [searchFlyoutOpen, setSearchFlyoutOpen] = useState(false);
+    const [searchFlyoutPos, setSearchFlyoutPos] = useState<{ top: number; left: number } | null>(null);
+    const searchTriggerRef = useRef<HTMLButtonElement>(null);
+    const searchInputRef = useRef<HTMLInputElement>(null);
 
-  const flat = useMemo(() => flattenRoutes(APP_ROUTES), []);
-  const isSearching = query.trim().length > 0;
-  const panelCollapsed = collapsed && !mobileOpen;
+    const flat = useMemo(() => flattenRoutes(APP_ROUTES), []);
+    const isSearching = query.trim().length > 0;
+    const panelCollapsed = collapsed && !mobileOpen;
+    const activeParentIds = useMemo(() => {
+        const next = new Set<string>();
+        for (const route of APP_ROUTES) {
+            if (route.children?.some((c) => c.href === pathname)) next.add(route.id);
+        }
+        return next;
+    }, [pathname]);
 
-  const filteredSections = useMemo(() => {
-    if (!isSearching) return NAV_SECTIONS;
-    const q = query.toLowerCase();
-    const matches = flat.filter((r) => r.searchLabel.toLowerCase().includes(q));
-    const ids = new Set(matches.map((m) => m.id));
-    return NAV_SECTIONS.map((section) => ({
-      ...section,
-      routes: section.routes.filter(
-        (r) =>
-          ids.has(r.id) ||
-          r.children?.some((c) => ids.has(c.id)) ||
-          r.label.toLowerCase().includes(q),
-      ),
-    })).filter((s) => s.routes.length > 0);
-  }, [query, flat, isSearching]);
+    const filteredSections = useMemo(() => {
+        if (!isSearching) return NAV_SECTIONS;
+        const q = query.toLowerCase();
+        const matches = flat.filter((r) => r.searchLabel.toLowerCase().includes(q));
+        const ids = new Set(matches.map((m) => m.id));
+        return NAV_SECTIONS.map((section) => ({
+            ...section,
+            routes: section.routes.filter(
+                (r) =>
+                    ids.has(r.id) ||
+                    r.children?.some((c) => ids.has(c.id)) ||
+                    r.label.toLowerCase().includes(q),
+            ),
+        })).filter((s) => s.routes.length > 0);
+    }, [query, flat, isSearching]);
 
-  useEffect(() => {
-    const next = new Set<string>();
-    for (const route of APP_ROUTES) {
-      if (route.children?.some((c) => c.href === pathname)) next.add(route.id);
-    }
-    setOpenIds((prev) => new Set([...prev, ...next]));
-  }, [pathname]);
+    useEffect(() => {
+        onMobileCloseAction?.();
+    }, [pathname, onMobileCloseAction]);
 
-  useEffect(() => {
-    onMobileClose?.();
-  }, [pathname, onMobileClose]);
+    useEffect(() => {
+        if (!panelCollapsed) {
+            setSearchFlyoutOpen(false);
+            setSearchFlyoutPos(null);
+        }
+    }, [panelCollapsed]);
 
-  useEffect(() => {
-    if (!isSearching) return;
-    const q = query.toLowerCase();
-    const next = new Set<string>();
-    for (const route of APP_ROUTES) {
-      if (route.children?.some((c) => c.label.toLowerCase().includes(q) || c.href?.includes(q))) {
-        next.add(route.id);
-      }
-    }
-    setOpenIds((prev) => new Set([...prev, ...next]));
-  }, [query, isSearching]);
+    useEffect(() => {
+        if (!searchFlyoutOpen) return;
 
-  const toggleGroup = (id: string) => {
-    setOpenIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") {
+                setSearchFlyoutOpen(false);
+                setSearchFlyoutPos(null);
+            }
+        };
 
-  const isOpen = (id: string) => isSearching || openIds.has(id);
+        document.addEventListener("keydown", onKeyDown);
+        return () => document.removeEventListener("keydown", onKeyDown);
+    }, [searchFlyoutOpen]);
 
-  const NavLink = ({ route, nested }: { route: AppRoute; nested?: boolean }) => {
-    const Icon = route.icon;
-    const active = route.href === pathname;
+    useEffect(() => {
+        if (searchFlyoutOpen) {
+            searchInputRef.current?.focus();
+        }
+    }, [searchFlyoutOpen, searchFlyoutPos]);
 
-    return (
-      <Link
-        href={route.href ?? "#"}
-        title={route.label}
-        onClick={() => onMobileClose?.()}
-        className={clsx(
-          "nav-item group",
-          nested && "nav-item-child",
-          panelCollapsed && !nested && "size-9 justify-center gap-0 px-0",
-          active && "nav-item-active",
-        )}
-      >
-        <Icon
-          className={clsx(
-            "size-[18px] shrink-0 transition-colors",
-            active ? "text-primary" : "text-base-content/45 group-hover:text-base-content/70",
-          )}
-          strokeWidth={2}
-        />
-        {!panelCollapsed && <span className="truncate">{route.label}</span>}
-      </Link>
-    );
-  };
+    const openSearchFlyout = () => {
+        const rect = searchTriggerRef.current?.getBoundingClientRect();
+        if (!rect) return;
 
-  const renderRoute = (route: AppRoute) => {
-    const Icon = route.icon;
-    const hasChildren = Boolean(route.children?.length);
-    const active = routeIsActive(route, pathname);
-    const expanded = isOpen(route.id);
+        setSearchFlyoutPos({top: rect.top, left: rect.right + 10});
+        setSearchFlyoutOpen(true);
+    };
 
-    if (panelCollapsed && hasChildren) {
-      return (
-        <li key={route.id}>
-          <button
-            type="button"
-            aria-label={route.label}
-            onClick={(e) => setFlyout({ route, top: e.currentTarget.getBoundingClientRect().top })}
-            className={clsx("nav-item size-9 justify-center gap-0 px-0", active && "nav-item-active")}
-          >
-            <Icon className="size-[18px]" strokeWidth={2} />
-          </button>
-        </li>
-      );
-    }
+    const closeSearchFlyout = () => {
+        setSearchFlyoutOpen(false);
+        setSearchFlyoutPos(null);
+    };
 
-    if (panelCollapsed) {
-      return (
-        <li key={route.id}>
-          <NavLink route={route} />
-        </li>
-      );
-    }
+    const toggleGroup = (id: string) => {
+        setOpenIds((prev) => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    };
 
-    if (!hasChildren) {
-      return (
-        <li key={route.id}>
-          <NavLink route={route} />
-        </li>
-      );
-    }
+    const isOpen = (id: string) => isSearching || activeParentIds.has(id) || openIds.has(id);
 
-    return (
-      <li key={route.id} className="grid gap-0.5">
-        <button
-          type="button"
-          onClick={() => toggleGroup(route.id)}
-          aria-expanded={expanded}
-          className={clsx("nav-item", active && !expanded && "font-semibold text-base-content")}
-        >
-          <Icon className="size-[18px] shrink-0 text-base-content/45" strokeWidth={2} />
-          <span className="flex-1 truncate text-left">{route.label}</span>
-          <ChevronRight
-            className={clsx(
-              "size-3.5 shrink-0 text-base-content/35 transition-transform duration-200",
-              expanded && "rotate-90",
-            )}
-          />
-        </button>
-        <AnimatePresence initial={false}>
-          {expanded && (
-            <motion.ul
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-              className="overflow-hidden"
+    const NavLink = ({route, nested}: { route: AppRoute; nested?: boolean }) => {
+        const Icon = route.icon;
+        const active = route.href === pathname;
+
+        return (
+            <Link
+                href={route.href ?? "#"}
+                title={route.label}
+                onClick={() => onMobileCloseAction?.()}
+                className={clsx(
+                    "nav-item group",
+                    nested && "nav-item-child",
+                    panelCollapsed && !nested && "nav-item-collapsed",
+                    active && "nav-item-active",
+                )}
             >
-              {route.children?.map((child) => (
-                <li key={child.id}>
-                  <NavLink route={child} nested />
+                <Icon
+                    className={clsx(
+                        "size-4.25 shrink-0 transition-colors duration-150",
+                        active
+                            ? "text-digital-blue-600"
+                            : "text-base-content/38 group-hover:text-base-content/65",
+                    )}
+                    strokeWidth={active ? 2.25 : 2}
+                />
+                <span className="sidebar-copy truncate">{route.label}</span>
+            </Link>
+        );
+    };
+
+    const renderRoute = (route: AppRoute) => {
+        const Icon = route.icon;
+        const hasChildren = Boolean(route.children?.length);
+        const active = routeIsActive(route, pathname);
+        const expanded = isOpen(route.id);
+
+        if (panelCollapsed && hasChildren) {
+            return (
+                <li key={route.id}>
+                    <button
+                        type="button"
+                        aria-label={route.label}
+                        onClick={(e) => setFlyout({route, top: e.currentTarget.getBoundingClientRect().top})}
+                        className={clsx("nav-item nav-item-collapsed", active && "nav-item-active")}
+                    >
+                        <Icon className="size-4.25" strokeWidth={2}/>
+                        <span className="sidebar-copy truncate text-left">{route.label}</span>
+                    </button>
                 </li>
-              ))}
-            </motion.ul>
-          )}
-        </AnimatePresence>
-      </li>
-    );
-  };
+            );
+        }
 
-  const sidebarPanel = (opts: { desktop: boolean }) => (
-    <>
-      <div
-        className="flex h-16 shrink-0 items-center gap-3 border-b px-4"
-        style={{ borderColor: "var(--sidebar-border)" }}
-      >
-        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary shadow-sm">
-          <span className="text-xs font-bold text-primary-content">G</span>
-        </div>
-        {!panelCollapsed && (
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold tracking-tight">Gommo</p>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-base-content/40">
-              Departamento Pessoal
-            </p>
-          </div>
-        )}
-      </div>
+        if (panelCollapsed) {
+            return (
+                <li key={route.id}>
+                    <NavLink route={route}/>
+                </li>
+            );
+        }
 
-      {!panelCollapsed && (
-        <div className="px-3 py-3">
-          <label className="gommo-field h-9 px-3">
-            <Search className="size-4 shrink-0 text-base-content/40" />
-            <input
-              type="search"
-              placeholder="Buscar no menu..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </label>
-        </div>
-      )}
+        if (!hasChildren) {
+            return (
+                <li key={route.id}>
+                    <NavLink route={route}/>
+                </li>
+            );
+        }
 
-      <nav className="flex-1 space-y-4 overflow-y-auto px-3 py-2" aria-label="Navegação principal">
-        {filteredSections.map((section) => (
-          <div key={section.id}>
-            {!panelCollapsed && <p className="nav-section-label mb-1">{section.label}</p>}
-            <ul className={clsx("space-y-0.5", panelCollapsed && "flex flex-col items-center")}>
-              {section.routes.map(renderRoute)}
-            </ul>
-          </div>
-        ))}
-      </nav>
+        return (
+            <li key={route.id} className="grid gap-0.5">
+                <button
+                    type="button"
+                    onClick={() => toggleGroup(route.id)}
+                    aria-expanded={expanded}
+                    className={clsx(
+                        "nav-item",
+                        active && !expanded && "font-semibold text-base-content/80",
+                    )}
+                >
+                    <Icon className="size-4.25 shrink-0 text-base-content/38" strokeWidth={2}/>
+                    <span className="sidebar-copy truncate text-left">{route.label}</span>
+                    <ChevronRight
+                        className={clsx(
+                            "sidebar-copy size-3.5 shrink-0 text-base-content/30 transition-transform duration-200",
+                            expanded && "rotate-90",
+                        )}
+                    />
+                </button>
+                <AnimatePresence initial={false}>
+                    {expanded && (
+                        <motion.ul
+                            initial={{height: 0, opacity: 0}}
+                            animate={{height: "auto", opacity: 1}}
+                            exit={{height: 0, opacity: 0}}
+                            transition={{duration: 0.2, ease: [0.22, 1, 0.36, 1]}}
+                            className="overflow-hidden"
+                        >
+                            {route.children?.map((child) => (
+                                <li key={child.id}>
+                                    <NavLink route={child} nested/>
+                                </li>
+                            ))}
+                        </motion.ul>
+                    )}
+                </AnimatePresence>
+            </li>
+        );
+    };
 
-      {opts.desktop && (
-        <button
-          type="button"
-          onClick={onToggle}
-          aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
-          className="absolute -right-3 top-20 z-50 flex size-6 items-center justify-center rounded-full border bg-base-100 text-base-content/50 shadow-sm transition-all hover:bg-base-200 hover:text-base-content"
-          style={{ borderColor: "var(--sidebar-border)" }}
-        >
-          <ChevronLeft
-            className={clsx("size-3.5 transition-transform duration-300", collapsed && "rotate-180")}
-          />
-        </button>
-      )}
-    </>
-  );
-
-  return (
-    <>
-      <AnimatePresence>
-        {mobileOpen && (
-          <>
-            <motion.button
-              type="button"
-              aria-label="Fechar menu"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-40 bg-base-content/25 backdrop-blur-[2px] lg:hidden"
-              onClick={onMobileClose}
-            />
-            <motion.aside
-              initial={{ x: "-100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed top-0 z-50 flex h-screen w-[var(--sidebar-width)] flex-col border-r lg:hidden"
-              style={{
-                background: "var(--sidebar-bg)",
-                borderColor: "var(--sidebar-border)",
-              }}
+    const sidebarPanel = (opts: { desktop: boolean }) => (
+        <>
+            {/* Logo area */}
+            <div
+                className="flex h-(--header-height) shrink-0 items-center gap-3 border-b px-4 bg-base-200"
+                style={{borderColor: "var(--sidebar-border)"}}
             >
-              {sidebarPanel({ desktop: false })}
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
+                <div
+                    className="flex size-8 shrink-0 items-center justify-center rounded-lg shadow-sm"
+                    style={{
+                        background: "linear-gradient(135deg, var(--color-digital-blue-500) 0%, var(--color-digital-blue-700) 100%)",
+                        boxShadow: "0 2px 8px color-mix(in srgb, var(--color-digital-blue-600) 35%, transparent), inset 0 1px 0 rgba(255,255,255,0.18)",
+                    }}
+                >
+                    <span className="text-[13px] font-bold tracking-tight text-white">G</span>
+                </div>
+                {!collapsed && (
+                    <div className="sidebar-copy min-w-0 flex-1">
+                        <p className="truncate text-[13px] font-bold tracking-tight text-base-content">Gommo</p>
+                        <p className="text-[9.5px] font-semibold uppercase tracking-[0.13em] text-base-content/35">
+                            Departamento Pessoal
+                        </p>
+                    </div>
+                )}
+            </div>
 
-      <motion.aside
-        layout
-        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-        className={clsx(
-          "fixed top-0 z-40 hidden h-screen flex-col border-r lg:flex",
-          collapsed ? "w-[var(--sidebar-collapsed)]" : "w-[var(--sidebar-width)]",
-        )}
-        style={{
-          background: "var(--sidebar-bg)",
-          borderColor: "var(--sidebar-border)",
-        }}
-      >
-        {sidebarPanel({ desktop: true })}
-      </motion.aside>
+            {/* Search */}
+            <motion.div
+                layout
+                transition={{duration: 0.5, ease: [0.22, 1, 0.36, 1]}}
+                className="relative px-3 py-3"
+            >
+                {panelCollapsed ? (
+                    <button
+                        ref={searchTriggerRef}
+                        type="button"
+                        aria-label="Buscar no menu"
+                        aria-expanded={searchFlyoutOpen}
+                        onClick={openSearchFlyout}
+                        className={clsx(
+                            "mx-auto flex size-9 shrink-0 items-center justify-center rounded-lg border bg-base-100 text-digital-blue-500 transition-colors duration-200",
+                            searchFlyoutOpen
+                                ? "border-digital-blue-300 bg-digital-blue-50 text-digital-blue-600"
+                                : "hover:border-digital-blue-200 hover:bg-digital-blue-50/70",
+                        )}
+                        style={{borderColor: searchFlyoutOpen ? undefined : "var(--sidebar-border)"}}
+                    >
+                        <Search className="size-3.5" strokeWidth={2}/>
+                    </button>
+                ) : (
+                    <label className="gommo-field h-9! min-h-9! rounded-lg! text-sm!">
+                        <Search className="size-3.5 shrink-0 text-digital-blue-400" strokeWidth={2}/>
+                        <input
+                            type="search"
+                            placeholder="Buscar no menu…"
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            className="text-sm!"
+                        />
+                    </label>
+                )}
+            </motion.div>
 
-      {collapsed && flyout && (
-        <SidebarFlyout route={flyout.route} anchorTop={flyout.top} onClose={() => setFlyout(null)} />
-      )}
-    </>
-  );
+            {/* Nav */}
+            <nav
+                className="flex-1 space-y-4 overflow-y-auto px-3 py-2 "
+                aria-label="Navegação principal"
+            >
+                {filteredSections.map((section) => (
+                    <div key={section.id}>
+                        <div className={`flex flex-col`}>
+                            <div className={`flex items-center min-h-6 px-3`}>
+                                {panelCollapsed ? (
+                                    <div className="nav-section-rule" aria-hidden="true"/>
+                                ) : (
+                                    <p className="nav-section-label">{section.label}</p>
+                                )}
+                            </div>
+                            <ul className="space-y-0.5">
+                                {section.routes.map(renderRoute)}
+                            </ul>
+                        </div>
+                    </div>
+                ))}
+            </nav>
+        </>
+    );
+
+    return (
+        <>
+            {/* Mobile overlay + drawer */}
+            <AnimatePresence>
+                {mobileOpen && (
+                    <>
+                        <motion.button
+                            type="button"
+                            aria-label="Fechar menu"
+                            initial={{opacity: 0}}
+                            animate={{opacity: 1}}
+                            exit={{opacity: 0}}
+                            transition={{duration: 0.2}}
+                            className="fixed inset-0 z-40 bg-base-content/20 backdrop-blur-[3px] lg:hidden"
+                            onClick={onMobileCloseAction}
+                        />
+                        <motion.aside
+                            initial={{x: "-100%"}}
+                            animate={{x: 0}}
+                            exit={{x: "-100%"}}
+                            transition={{duration: 0.28, ease: [0.22, 1, 0.36, 1]}}
+                            className="fixed top-0 z-50 flex h-screen w-(--sidebar-width) flex-col border-r lg:hidden"
+                            style={{background: "var(--sidebar-bg)", borderColor: "var(--sidebar-border)"}}
+                        >
+                            {sidebarPanel({desktop: false})}
+                        </motion.aside>
+                    </>
+                )}
+            </AnimatePresence>
+
+            {/* Desktop sidebar */}
+            <aside
+                data-collapsed={collapsed ? "true" : undefined}
+                className={clsx(
+                    "fixed top-0 z-40 hidden h-screen flex-col overflow-visible border-r transition-[width] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:flex",
+                    collapsed ? "w-(--sidebar-collapsed)" : "w-(--sidebar-width)",
+                )}
+                style={{background: "var(--sidebar-bg)", borderColor: "var(--sidebar-border)"}}
+            >
+                {sidebarPanel({desktop: true})}
+
+                <button
+                    type="button"
+                    onClick={onToggleAction}
+                    aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
+                    className="sidebar-toggle-btn hidden lg:flex"
+                >
+                    <ChevronLeft
+                        className={clsx("size-3.5 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]", collapsed && "rotate-180")}
+                    />
+                </button>
+            </aside>
+
+            <AnimatePresence>
+                {searchFlyoutOpen && searchFlyoutPos && panelCollapsed && (
+                    <>
+                        <motion.button
+                            type="button"
+                            aria-label="Fechar busca"
+                            initial={{opacity: 0}}
+                            animate={{opacity: 1}}
+                            exit={{opacity: 0}}
+                            transition={{duration: 0.15}}
+                            className="fixed inset-0 z-[60] bg-transparent"
+                            onClick={closeSearchFlyout}
+                        />
+                        <motion.div
+                            role="dialog"
+                            aria-label="Buscar no menu"
+                            initial={{opacity: 0, x: -6, scale: 0.98}}
+                            animate={{opacity: 1, x: 0, scale: 1}}
+                            exit={{opacity: 0, x: -6, scale: 0.98}}
+                            transition={{duration: 0.2, ease: [0.22, 1, 0.36, 1]}}
+                            className="sidebar-search-flyout fixed z-[70] p-2"
+                            style={{top: searchFlyoutPos.top, left: searchFlyoutPos.left}}
+                            onMouseDown={(e) => e.stopPropagation()}
+                        >
+                            <label className="gommo-field h-9! min-h-9! w-[15rem] rounded-lg! text-sm!">
+                                <Search className="size-3.5 shrink-0 text-digital-blue-400" strokeWidth={2}/>
+                                <input
+                                    ref={searchInputRef}
+                                    type="search"
+                                    placeholder="Buscar no menu…"
+                                    value={query}
+                                    onChange={(e) => setQuery(e.target.value)}
+                                    className="text-sm!"
+                                />
+                            </label>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+
+            {collapsed && flyout && (
+                <SidebarFlyout route={flyout.route} anchorTop={flyout.top} onClose={() => setFlyout(null)}/>
+            )}
+        </>
+    );
 }

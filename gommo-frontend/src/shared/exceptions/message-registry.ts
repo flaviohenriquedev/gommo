@@ -1,16 +1,16 @@
 import { AUTH_CLIENT_MESSAGES, AUTH_MESSAGES } from "@/modules/root/exceptions/auth.messages";
 import {
-  PERSON_CLIENT_MESSAGES,
-  PERSON_MESSAGES,
-} from "@/modules/person/exceptions/person.messages";
+  COLLABORATOR_CLIENT_MESSAGES,
+  COLLABORATOR_MESSAGES,
+} from "@/modules/collaborator/exceptions/collaborator.messages";
 import { CORE_MESSAGES } from "@/shared/exceptions/core.messages";
 
 const REGISTRY: Record<string, string> = {
   ...CORE_MESSAGES,
   ...AUTH_MESSAGES,
   ...AUTH_CLIENT_MESSAGES,
-  ...PERSON_MESSAGES,
-  ...PERSON_CLIENT_MESSAGES,
+  ...COLLABORATOR_MESSAGES,
+  ...COLLABORATOR_CLIENT_MESSAGES,
 };
 
 export function resolveMessageByCode(code: string | undefined, fallback: string): string {

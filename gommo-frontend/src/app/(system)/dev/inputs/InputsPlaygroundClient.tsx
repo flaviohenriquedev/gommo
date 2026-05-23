@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { personService } from "@/modules/person/services/person.service";
+import { collaboratorService } from "@/modules/collaborator/services/collaborator.service";
 import { Card } from "@/shared/components/ui/Card";
 import {
   InputAutocomplete,
@@ -46,8 +46,8 @@ type FormState = {
   maritalStatus: string;
   decimal: string;
   currencyCents: string;
-  personId: string;
-  hybridPersonId: string;
+  collaboratorId: string;
+  hybridCollaboratorId: string;
 };
 
 const initial: FormState = {
@@ -62,8 +62,8 @@ const initial: FormState = {
   maritalStatus: "",
   decimal: "",
   currencyCents: "",
-  personId: "",
-  hybridPersonId: "",
+  collaboratorId: "",
+  hybridCollaboratorId: "",
 };
 
 function ValuesPreview({ values }: { values: FormState }) {
@@ -81,8 +81,8 @@ export function InputsPlaygroundClient() {
     setValues((prev) => ({ ...prev, ...partial }));
   }, []);
 
-  const searchPersons = useCallback(
-    (query: string, page: number) => personService.searchForAutocomplete(query, page),
+  const searchCollaborators = useCallback(
+    (query: string, page: number) => collaboratorService.searchForAutocomplete(query, page),
     [],
   );
 
@@ -93,7 +93,7 @@ export function InputsPlaygroundClient() {
           label="Nome completo"
           value={values.fullName}
           onValueChange={(fullName) => patch({ fullName })}
-          placeholder="Como em Person.fullName"
+          placeholder="Como em Collaborator.fullName"
           required
         />
         <div className="grid gap-4 sm:grid-cols-2">
@@ -122,7 +122,7 @@ export function InputsPlaygroundClient() {
 
       <Card title="Select, Autocomplete e híbrido" bodyClassName="space-y-4">
         <InputSelect
-          label="Gênero (Person)"
+          label="Gênero (Colaborador)"
           items={GENDER_ITEMS}
           value={values.gender}
           onValueChange={(gender) => patch({ gender })}
@@ -130,28 +130,28 @@ export function InputsPlaygroundClient() {
           clearable
         />
         <InputSelect
-          label="Estado civil (Person)"
+          label="Estado civil (Colaborador)"
           items={MARITAL_ITEMS}
           value={values.maritalStatus}
           onValueChange={(maritalStatus) => patch({ maritalStatus })}
           clearable
         />
         <InputAutocomplete
-          label="Pessoa (autocomplete)"
-          hint="Busca em Person — máx. 6 por página"
-          value={values.personId}
-          onValueChange={(personId) => patch({ personId })}
-          onSearch={searchPersons}
+          label="Colaborador (autocomplete)"
+          hint="Busca em colaboradores — máx. 6 por página"
+          value={values.collaboratorId}
+          onValueChange={(collaboratorId) => patch({ collaboratorId })}
+          onSearch={searchCollaborators}
           placeholder="Digite nome ou CPF..."
         />
         <InputSelectAutocomplete
-          label="Híbrido: gênero local + pessoa remota"
-          hint="Digite 'Mas' para filtrar gêneros; 'Maria' para buscar pessoas"
+          label="Híbrido: gênero local + colaborador remoto"
+          hint="Digite 'Mas' para filtrar gêneros; 'Maria' para buscar colaboradores"
           items={GENDER_ITEMS}
-          onSearch={searchPersons}
-          value={values.hybridPersonId}
-          onValueChange={(hybridPersonId) => patch({ hybridPersonId })}
-          placeholder="Lista fixa ou busca Person..."
+          onSearch={searchCollaborators}
+          value={values.hybridCollaboratorId}
+          onValueChange={(hybridCollaboratorId) => patch({ hybridCollaboratorId })}
+          placeholder="Lista fixa ou busca colaboradores..."
         />
       </Card>
 

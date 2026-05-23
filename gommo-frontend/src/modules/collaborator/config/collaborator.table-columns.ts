@@ -1,6 +1,6 @@
 import {TableDataType, type TableColumnConfig} from "@/shared/types/table.types";
 
-export const PERSON_TABLE_COLUMNS: TableColumnConfig[] = [
+export const COLLABORATOR_TABLE_COLUMNS: TableColumnConfig[] = [
     {
         id: "fullName",
         columnName: "Nome",

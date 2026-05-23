@@ -1,4 +1,4 @@
-export class Person {
+export class Collaborator {
     id!: string;
     status!: "ACTIVE" | "INACTIVE" | "DELETED";
     fullName!: string;
@@ -16,16 +16,16 @@ export class Person {
     updatedAt?: string;
 }
 
-export type PersonWriteDto = PersonCreateDto;
+export type CollaboratorWriteDto = CollaboratorCreateDto;
 
-export class PersonCreateDto {
+export class CollaboratorCreateDto {
     fullName!: string;
     socialName?: string;
     cpf!: string;
     rg?: string;
     birthDate!: string;
-    gender?: Person["gender"];
-    maritalStatus?: Person["maritalStatus"];
+    gender?: Collaborator["gender"];
+    maritalStatus?: Collaborator["maritalStatus"];
     motherName?: string;
     fatherName?: string;
     nationality?: string;

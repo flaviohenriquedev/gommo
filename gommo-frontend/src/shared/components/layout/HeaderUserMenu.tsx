@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, LogOut } from "lucide-react";
+import { ChevronDown, LogOut, Settings } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { userInitials } from "@/shared/lib/user-display";
@@ -13,6 +13,7 @@ export function HeaderUserMenu() {
   const rootRef = useRef<HTMLDivElement>(null);
 
   const name = session?.user?.name ?? "Usuário";
+  const initials = userInitials(name);
 
   useEffect(() => {
     if (!open) return;
@@ -22,7 +23,6 @@ export function HeaderUserMenu() {
         setOpen(false);
       }
     };
-
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
     };
@@ -37,6 +37,7 @@ export function HeaderUserMenu() {
 
   return (
     <div ref={rootRef} className="relative ms-0.5 sm:ms-1">
+      {/* Trigger */}
       <button
         type="button"
         aria-label="Menu do usuário"
@@ -44,55 +45,82 @@ export function HeaderUserMenu() {
         aria-haspopup="menu"
         onClick={() => setOpen((v) => !v)}
         className={clsx(
-          "flex items-center gap-1.5 rounded-full py-1 ps-1 pe-2 transition-colors",
-          open ? "bg-base-200" : "hover:bg-base-200/80",
+          "flex items-center gap-2 rounded-[10px] py-1 ps-1 pe-2.5 transition-colors duration-150",
+          open ? "bg-digital-blue-50" : "hover:bg-base-200/70",
         )}
       >
-        <span className="flex size-8 items-center justify-center rounded-full bg-primary/12 text-xs font-bold text-primary">
-          {userInitials(name)}
+        {/* Avatar */}
+        <span
+          className="flex size-7 items-center justify-center rounded-full text-[11px] font-bold text-white"
+          style={{
+            background: "linear-gradient(135deg, var(--color-digital-blue-400) 0%, var(--color-digital-blue-600) 100%)",
+          }}
+        >
+          {initials}
         </span>
-        <span className="hidden max-w-[7rem] truncate text-xs font-semibold text-base-content sm:inline">
+        <span className="hidden max-w-[8rem] truncate text-[13px] font-semibold text-base-content sm:inline">
           {name}
         </span>
         <ChevronDown
           className={clsx(
-            "hidden size-3.5 text-base-content/40 transition-transform sm:block",
+            "hidden size-3 text-base-content/35 transition-transform duration-200 sm:block",
             open && "rotate-180",
           )}
         />
       </button>
 
+      {/* Dropdown */}
       <AnimatePresence>
         {open && (
           <motion.div
             role="menu"
             aria-label="Conta do usuário"
-            initial={{ opacity: 0, y: -4, scale: 0.98 }}
+            initial={{ opacity: 0, y: -5, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -4, scale: 0.98 }}
-            transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
-            className="surface-card absolute right-0 z-50 mt-2 min-w-[12.5rem] origin-top-right p-1.5 shadow-lg"
+            exit={{ opacity: 0, y: -5, scale: 0.97 }}
+            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            className="surface-popover absolute right-0 z-50 mt-2 min-w-[13rem] origin-top-right p-1.5"
           >
-            <div className="flex items-center gap-2.5 rounded-lg px-2.5 py-2">
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary/90 to-primary text-xs font-bold text-primary-content">
-                {userInitials(name)}
+            {/* User info */}
+            <div className="flex items-center gap-3 rounded-[10px] px-3 py-2.5">
+              <span
+                className="flex size-9 shrink-0 items-center justify-center rounded-full text-[12px] font-bold text-white"
+                style={{
+                  background: "linear-gradient(135deg, var(--color-digital-blue-400) 0%, var(--color-digital-blue-700) 100%)",
+                  boxShadow: "0 2px 8px color-mix(in srgb, var(--color-digital-blue-600) 30%, transparent)",
+                }}
+              >
+                {initials}
               </span>
               <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-base-content">{name}</p>
-                <p className="text-[11px] text-base-content/45">Administrador</p>
+                <p className="truncate text-[13px] font-semibold text-base-content">{name}</p>
+                <p className="text-[11px] text-base-content/40">Administrador</p>
               </div>
             </div>
 
-            <div className="my-1 h-px bg-base-300/60" />
+            <div className="my-1 h-px bg-digital-blue-100/70" />
 
+            {/* Settings (placeholder) */}
             <button
               type="button"
               role="menuitem"
-              className="nav-item w-full gap-2 !px-2.5 text-left text-error hover:bg-error/8 hover:text-error"
+              className="nav-item gap-2.5 !px-3 text-left text-[13px]"
+            >
+              <Settings className="size-[15px] shrink-0 text-base-content/38" strokeWidth={2} />
+              Configurações
+            </button>
+
+            <div className="my-1 h-px bg-digital-blue-100/70" />
+
+            {/* Sign out */}
+            <button
+              type="button"
+              role="menuitem"
+              className="nav-item gap-2.5 !px-3 text-left text-[13px] text-error hover:bg-error/8 hover:text-error"
               onClick={() => signOut({ callbackUrl: "/login" })}
             >
-              <LogOut className="size-4 shrink-0" />
-              Sair
+              <LogOut className="size-[15px] shrink-0" strokeWidth={2} />
+              Sair da conta
             </button>
           </motion.div>
         )}

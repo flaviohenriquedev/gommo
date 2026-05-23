@@ -9,7 +9,6 @@ import {
     Gift,
     LayoutDashboard,
     Receipt,
-    UserCircle,
     Users,
 } from "lucide-react";
 
@@ -34,22 +33,21 @@ export const NAV_SECTIONS: NavSection[] = [
         label: "Visão geral",
         routes: [
             {id: "dashboard", label: "Dashboard", href: "/dashboard", icon: LayoutDashboard},
-            {id: "person", label: "Pessoas", href: "/person", icon: UserCircle, permission: "person:read"},
             {id: "dev-inputs", label: "Inputs (dev)", href: "/dev/inputs", icon: FlaskConical},
         ],
     },
     {
         id: "people",
-        label: "Pessoas e vínculos",
+        label: "Colaboradores e vínculos",
         routes: [
             {
-                id: "employee",
-                label: "Funcionários",
+                id: "collaborator",
+                label: "Colaboradores",
                 icon: Users,
-                permission: "person:read",
+                permission: "collaborator:read",
                 children: [
-                    {id: "employee-list", label: "Cadastro", href: "/employee", icon: Users},
-                    {id: "employee-history", label: "Histórico", href: "/employee/history", icon: ClipboardList},
+                    {id: "collaborator-list", label: "Cadastro", href: "/collaborator", icon: Users},
+                    {id: "collaborator-history", label: "Histórico", href: "/collaborator/history", icon: ClipboardList},
                 ],
             },
             {id: "contract", label: "Contratos", href: "/contract", icon: Briefcase},

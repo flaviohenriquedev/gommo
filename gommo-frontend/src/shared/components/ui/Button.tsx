@@ -15,17 +15,22 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const variantClass: Record<ButtonVariant, string> = {
-  primary: "btn-primary shadow-sm hover:brightness-[1.02] active:brightness-[0.98]",
-  secondary: "btn-secondary",
-  ghost: "btn-ghost bg-transparent hover:bg-base-200/80",
-  outline: "btn-outline border-base-300/80 bg-base-100 hover:border-primary/40",
-  danger: "btn-error",
+  primary:   "gommo-btn--primary",
+  secondary: "gommo-btn--secondary",
+  ghost:     "gommo-btn--ghost",
+  outline:   "gommo-btn--outline",
+  danger:    "gommo-btn--danger",
 };
 
+/**
+ * sm  — h-36px, px-14, r-8px, 13px  (toolbar / compact actions)
+ * md  — h-46px, px-21, r-10px, 15px (default — mirrors .btn--m reference)
+ * lg  — h-46px, px-24, r-10px, 16px (hero / page-level CTAs)
+ */
 const sizeClass: Record<ButtonSize, string> = {
-  sm: "btn-sm h-8 min-h-8 gap-1.5 px-3 text-xs font-semibold",
-  md: "btn-md h-9 min-h-9 gap-2 px-4 text-sm font-semibold",
-  lg: "btn-lg h-10 min-h-10 gap-2 px-5 text-sm font-semibold",
+  sm: "gommo-btn--sm",
+  md: "",
+  lg: "!px-6 !text-base",
 };
 
 export function Button({
@@ -40,20 +45,24 @@ export function Button({
   type = "button",
   ...props
 }: ButtonProps) {
+  const iconOnly = !children && (leftIcon || rightIcon);
+
   return (
     <button
       type={type}
       className={clsx(
-        "btn rounded-lg border-0 tracking-tight transition-all duration-200",
-        "active:scale-[0.98] disabled:active:scale-100",
+        "gommo-btn",
         variantClass[variant],
         sizeClass[size],
+        iconOnly && "gommo-btn--icon-only",
         className,
       )}
       disabled={disabled || loading}
       {...props}
     >
-      {loading && <span className="loading loading-spinner loading-xs" />}
+      {loading && (
+        <span className="loading loading-spinner loading-xs text-current" />
+      )}
       {!loading && leftIcon}
       {children}
       {!loading && rightIcon}

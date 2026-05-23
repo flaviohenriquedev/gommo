@@ -3,11 +3,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
-import { PERSON_CLIENT_MESSAGES } from "@/modules/person/exceptions/person.messages";
-import type { PersonCreateDto } from "@/modules/person/dto/person.dto";
-import { emptyPersonForm, personToFormDto } from "@/modules/person/lib/person.mapper";
-import { personKeys } from "@/modules/person/person.query";
-import { personService } from "@/modules/person/services/person.service";
+import { COLLABORATOR_CLIENT_MESSAGES } from "@/modules/collaborator/exceptions/collaborator.messages";
+import type { CollaboratorCreateDto } from "@/modules/collaborator/dto/collaborator.dto";
+import { emptyCollaboratorForm, collaboratorToFormDto } from "@/modules/collaborator/lib/collaborator.mapper";
+import { collaboratorKeys } from "@/modules/collaborator/collaborator.query";
+import { collaboratorService } from "@/modules/collaborator/services/collaborator.service";
 import { useCrudScreen } from "@/shared/components/crud/CrudScreen";
 import { ExceptionCapture } from "@/shared/exceptions";
 import { Button } from "@/shared/components/ui/Button";
@@ -35,61 +35,61 @@ const MARITAL_ITEMS: SelectItem[] = [
   { value: "OTHER", label: "Outro" },
 ];
 
-export function PersonFormClient() {
+export function CollaboratorFormClient() {
   const { editingId, isEditing, goToList, startCreate } = useCrudScreen();
   const queryClient = useQueryClient();
-  const [form, setForm] = useState<PersonCreateDto>(emptyPersonForm);
+  const [form, setForm] = useState<CollaboratorCreateDto>(emptyCollaboratorForm);
   const [error, setError] = useState<string | null>(null);
 
   const detailQuery = useQuery({
-    queryKey: personKeys.detail(editingId ?? ""),
-    queryFn: () => personService.getById(editingId!),
+    queryKey: collaboratorKeys.detail(editingId ?? ""),
+    queryFn: () => collaboratorService.getById(editingId!),
     enabled: isEditing && Boolean(editingId),
   });
 
   useEffect(() => {
     if (!isEditing) {
-      setForm(emptyPersonForm());
+      setForm(emptyCollaboratorForm());
       setError(null);
       return;
     }
     if (detailQuery.data) {
-      setForm(personToFormDto(detailQuery.data));
+      setForm(collaboratorToFormDto(detailQuery.data));
       setError(null);
     }
   }, [isEditing, detailQuery.data]);
 
   const saveMutation = useMutation({
-    mutationFn: async (dto: PersonCreateDto) => {
-      const payload: PersonCreateDto = {
+    mutationFn: async (dto: CollaboratorCreateDto) => {
+      const payload: CollaboratorCreateDto = {
         ...dto,
         gender: dto.gender || undefined,
         maritalStatus: dto.maritalStatus || undefined,
       };
       if (isEditing && editingId) {
-        return personService.update(editingId, payload);
+        return collaboratorService.update(editingId, payload);
       }
-      return personService.create(payload);
+      return collaboratorService.create(payload);
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: personKeys.all });
+      await queryClient.invalidateQueries({ queryKey: collaboratorKeys.all });
       if (editingId) {
-        await queryClient.invalidateQueries({ queryKey: personKeys.detail(editingId) });
+        await queryClient.invalidateQueries({ queryKey: collaboratorKeys.detail(editingId) });
       }
-      toast.success(isEditing ? "Pessoa atualizada" : "Pessoa cadastrada");
-      setForm(emptyPersonForm());
+      toast.success(isEditing ? "Colaborador atualizado" : "Colaborador cadastrado");
+      setForm(emptyCollaboratorForm());
       setError(null);
       goToList();
     },
     onError: (err: unknown) => {
       const ex = ExceptionCapture.handle(err, {
-        fallbackMessage: PERSON_CLIENT_MESSAGES.PERSON_SAVE_FAILED,
+        fallbackMessage: COLLABORATOR_CLIENT_MESSAGES.COLLABORATOR_SAVE_FAILED,
       });
       setError(ex.displayMessage);
     },
   });
 
-  const update = <K extends keyof PersonCreateDto>(field: K, value: PersonCreateDto[K]) => {
+  const update = <K extends keyof CollaboratorCreateDto>(field: K, value: CollaboratorCreateDto[K]) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -115,7 +115,7 @@ export function PersonFormClient() {
         <p className="text-sm font-medium text-error">
           {ExceptionCapture.displayMessage(
             detailQuery.error,
-            PERSON_CLIENT_MESSAGES.PERSON_LOAD_FAILED,
+            COLLABORATOR_CLIENT_MESSAGES.COLLABORATOR_LOAD_FAILED,
           )}
         </p>
         <Button variant="ghost" size="sm" className="mt-3" onClick={goToList}>
@@ -126,10 +126,10 @@ export function PersonFormClient() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4 p-5 sm:grid-cols-2">
+    <form onSubmit={handleSubmit} className="grid gap-3 p-4 sm:grid-cols-2">
       <div className="sm:col-span-2">
         <p className="text-sm font-semibold text-base-content">
-          {isEditing ? "Editar pessoa" : "Nova pessoa"}
+          {isEditing ? "Editar colaborador" : "Novo colaborador"}
         </p>
         <p className="text-xs text-base-content/45">
           Campos obrigatórios: nome completo, CPF e data de nascimento.
@@ -170,7 +170,7 @@ export function PersonFormClient() {
         label="Gênero"
         items={GENDER_ITEMS}
         value={form.gender ?? ""}
-        onValueChange={(v) => update("gender", (v || undefined) as PersonCreateDto["gender"])}
+        onValueChange={(v) => update("gender", (v || undefined) as CollaboratorCreateDto["gender"])}
         placeholder="Não informado"
         clearable
       />
@@ -179,7 +179,7 @@ export function PersonFormClient() {
         items={MARITAL_ITEMS}
         value={form.maritalStatus ?? ""}
         onValueChange={(v) =>
-          update("maritalStatus", (v || undefined) as PersonCreateDto["maritalStatus"])
+          update("maritalStatus", (v || undefined) as CollaboratorCreateDto["maritalStatus"])
         }
         placeholder="Não informado"
         clearable

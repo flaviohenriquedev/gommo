@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "@/shared/components/providers/AppProviders";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+});
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -18,7 +25,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <body className={`${jakarta.variable} surface-page min-h-full antialiased`}>
+      <body className={`${inter.variable} ${jakarta.variable} surface-page min-h-full antialiased`}>
         <AppProviders>{children}</AppProviders>
       </body>
     </html>
