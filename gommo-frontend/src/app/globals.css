@@ -1,0 +1,167 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@plugin "daisyui/theme" {
+  name: "gommo";
+  default: false;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(98% 0 0);
+  --color-base-200: oklch(97% 0 0);
+  --color-base-300: oklch(92% 0 0);
+  --color-base-content: oklch(20% 0 0);
+  --color-primary: oklch(83% 0.128 66.29);
+  --color-primary-content: oklch(98% 0.018 155.826);
+  --color-secondary: oklch(55% 0.195 38.402);
+  --color-secondary-content: oklch(100% 0 0);
+  --color-accent: oklch(79% 0.184 86.047);
+  --color-accent-content: oklch(98% 0.026 102.212);
+  --color-neutral: oklch(70% 0.213 47.604);
+  --color-neutral-content: oklch(98% 0 0);
+  --color-info: oklch(62% 0.214 259.815);
+  --color-info-content: oklch(97% 0.014 254.604);
+  --color-success: oklch(76% 0.233 130.85);
+  --color-success-content: oklch(98% 0.031 120.757);
+  --color-warning: oklch(76% 0.188 70.08);
+  --color-warning-content: oklch(98% 0.022 95.277);
+  --color-error: oklch(63% 0.237 25.331);
+  --color-error-content: oklch(96% 0.015 12.422);
+  --radius-selector: 1rem;
+  --radius-field: 0.5rem;
+  --radius-box: 2rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 2px;
+  --depth: 1;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "dark";
+  prefersdark: true;
+  color-scheme: dark;
+  --color-base-100: oklch(18% 0.015 260);
+  --color-base-200: oklch(14% 0.015 260);
+  --color-base-300: oklch(26% 0.02 260);
+  --color-base-content: oklch(96% 0.008 260);
+  --color-primary: oklch(83% 0.128 66.29);
+  --color-primary-content: oklch(18% 0 0);
+}
+
+@theme inline {
+  --font-sans: var(--font-inter);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.012em;
+  background: var(--color-base-200);
+  color: var(--color-base-content);
+}
+
+::selection {
+  background: color-mix(in oklch, var(--color-primary) 40%, transparent);
+}
+
+/* ——— Padrão visual Gommo (DaisyUI theme generator) ——— */
+
+.gommo-card {
+  border-radius: var(--radius-box);
+  border: 1px solid color-mix(in oklch, var(--color-base-300) 55%, transparent);
+  background: var(--color-base-100);
+  box-shadow: 0 1px 3px color-mix(in oklch, var(--color-base-content) 4%, transparent);
+}
+
+.gommo-sidebar {
+  background: var(--color-base-100);
+  border-right: 1px solid color-mix(in oklch, var(--color-base-300) 50%, transparent);
+}
+
+.gommo-nav {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.625rem;
+  border-radius: var(--radius-box);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.15s ease;
+}
+
+.gommo-nav:hover {
+  background: var(--color-base-200);
+  color: var(--color-base-content);
+}
+
+.gommo-nav-active {
+  background: var(--color-neutral);
+  color: var(--color-neutral-content);
+  box-shadow: 0 1px 2px color-mix(in oklch, var(--color-base-content) 8%, transparent);
+}
+
+.gommo-nav-active:hover {
+  background: var(--color-neutral);
+  color: var(--color-neutral-content);
+}
+
+.gommo-nav-child {
+  padding-left: 2rem;
+  font-size: 0.625rem;
+  font-weight: 500;
+}
+
+.gommo-input {
+  border-radius: var(--radius-box);
+  border: 1px solid color-mix(in oklch, var(--color-base-300) 70%, transparent);
+  background: var(--color-base-200);
+  min-height: 2.5rem;
+  font-size: 0.75rem;
+}
+
+.gommo-input:focus {
+  border-color: var(--color-primary) !important;
+  background: var(--color-base-100);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-primary) 22%, transparent);
+}
+
+.gommo-topbar {
+  background: var(--color-base-100);
+  border-bottom: 1px solid color-mix(in oklch, var(--color-base-300) 45%, transparent);
+}
+
+.skeleton-shimmer {
+  border-radius: var(--radius-box);
+  background: linear-gradient(
+    90deg,
+    var(--color-base-200) 0%,
+    var(--color-base-100) 50%,
+    var(--color-base-200) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}

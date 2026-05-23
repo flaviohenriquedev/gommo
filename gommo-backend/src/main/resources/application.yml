@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: gommo-backend
+  jackson:
+    time-zone: America/Sao_Paulo
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: America/Sao_Paulo
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+server:
+  port: ${SERVER_PORT:8081}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+gommo:
+  security:
+    jwt:
+      secret: ${JWT_SECRET}
+      access-token-minutes: 15
+      refresh-token-days: 7
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:3000}
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - [%X{correlationId}] %msg%n"

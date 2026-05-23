@@ -1,0 +1,74 @@
+---
+description: Gommo — arquitetura, stack, convenções e regras absolutas (DP/RH)
+alwaysApply: true
+---
+
+# Gommo — Departamento Pessoal
+
+Monolito modular (bounded contexts), preparado para microserviços. **Nunca** dependência direta entre módulos — use eventos de integração.
+
+## Repositórios
+
+- Frontend: `gommo-frontend/` (Next.js App Router, `src/`)
+- Backend: `gommo-backend/` (Spring Boot, pacote `br.com.gommo`)
+
+## Stack (versões do repo)
+
+- FE: Next.js, TypeScript strict, Tailwind 4, DaisyUI, NextAuth, next-themes, Framer Motion, Sonner
+- BE: Spring Boot 4, Java 21, Spring Security, JPA, Flyway, PostgreSQL
+- Infra: Docker Compose, Nginx (prod), Prometheus/Grafana, timezone `America/Sao_Paulo`
+
+## Módulos (nomes idênticos FE/BE)
+
+`root`, `person`, `employee`, `payroll`, `leave`, `benefit`, `attendance`, `contract`, `tax`, `performance`, `report`, `admission`
+
+## Backend — obrigatório
+
+- CRUD via `BaseController` / `BaseService` / `IBaseRepository` — controllers filhos **não** redeclaram endpoints; RBAC com `@PreAuthorize` no service do módulo
+- Entidades: `BaseEntity` (id UUID, status) + `AuditEntity` (created/updated by/at)
+- Soft delete: `status = DELETED` — sem DELETE físico
+- Flyway para **toda** alteração de schema (`V{n}__descricao_snake_case.sql`)
+- API versionada: `/api/v1/...`
+- DTOs sempre **classes** (não records) com Lombok `@Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor`
+- Em entidades JPA: **sem @Data** — `@Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor`
+- Regras de negócio em UseCase/Service — **não** no Controller
+- Exceções: `BusinessException` + `GlobalExceptionHandler`
+- Logs: SLF4J estruturado; correlation-id `X-Correlation-ID` em todo request
+- JWT: access 15min, refresh 7d com rotação + blacklist (DB)
+- Senha: BCrypt strength 12; RBAC `@PreAuthorize` por módulo
+- IDs: UUID; timestamps: `TIMESTAMPTZ`
+
+## Frontend — obrigatório
+
+- `BaseService<T>`: getAll, getById, create, update, remove
+- Rotas/menus: arquivo `.ts` tipado (`Route`) — **não** hardcoded em JSX
+- Sidebar esquerda: expandir/retrair; retraída = ícones + flyout de submenus; busca de menus
+- Login: formulário coluna direita + branding coluna esquerda
+- Dark mode (next-themes); inputs focus = border only (sem outline)
+- Grid para layout; flex interno; 100% responsivo; botões componentizados
+- Perguntar antes de adicionar dependência Maven/NPM não listada no plano
+
+## Nomenclatura
+
+| Camada | Padrão |
+|--------|--------|
+| FE component | `PersonForm.tsx` |
+| FE hook | `usePerson.ts` |
+| FE service | `person.service.ts` |
+| BE entity | `Person.java` |
+| BE service | `PersonService.java` / `IPersonService.java` |
+| BE DTO | `PersonRequestDto.java` / `PersonResponseDto.java` |
+| BE use case | `CreatePersonUseCase.java` |
+
+## Ao gerar código
+
+- Manter estrutura de pastas do módulo
+- Interface + implementação
+- Validação nos DTOs (`@NotNull`, `@Size`)
+- Migration Flyway junto com entidade
+- Não quebrar contratos sem versionar API
+- SOLID, DDD (linguagem ubíqua), Strategy para cálculos (payroll/benefit)
+
+## Fase atual (01 — Fundação)
+
+Docker, bases genéricas, auth JWT/RBAC, Flyway, módulo Person, shell FE (login + sidebar + tema).

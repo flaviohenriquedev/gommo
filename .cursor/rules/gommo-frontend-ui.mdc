@@ -1,0 +1,19 @@
+---
+description: Gommo frontend — UI, layout, sidebar e tema DaisyUI
+globs: gommo-frontend/**/*.{tsx,css}
+alwaysApply: false
+---
+
+# UI Gommo
+
+- DTOs sempre **classes**; `strictPropertyInitialization: false` no tsconfig
+- HTTP: **fetch nativo** (não axios)
+- Dados: importar de `@/shared/components/data/DataPanel` — `DataRequest` (server), `DataResult` (client + `use()`), `QueryPanel` (React Query cache/reload)
+- Tema DaisyUI custom (tokens em `globals.css`); sem outline em focus — só `border`
+- Transições suaves (Framer Motion onde fizer sentido)
+- Toasts: Sonner
+- Menu lateral: toggle expand/retract; ícones alinhados igual nos dois modos; flyout ao clicar ícone quando retraído
+- Busca de menus na sidebar
+- Definição de rotas: `src/config/routes.ts` (tipado `AppRoute`)
+- Login: 2 colunas (brand | form); dark mode toggle global
+- Performance: evitar animações pesadas; preferir CSS transitions leves
