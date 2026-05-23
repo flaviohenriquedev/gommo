@@ -16,6 +16,8 @@ export class Person {
     updatedAt?: string;
 }
 
+export type PersonWriteDto = PersonCreateDto;
+
 export class PersonCreateDto {
     fullName!: string;
     socialName?: string;

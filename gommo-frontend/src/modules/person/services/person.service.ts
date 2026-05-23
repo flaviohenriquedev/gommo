@@ -1,10 +1,48 @@
-import {BaseService} from "@/modules/root/services/base.service";
-import type {Person, PersonCreateDto} from "@/modules/person/dto/person.dto";
+import type { Person } from "@/modules/person/dto/person.dto";
+import { BaseService } from "@/modules/root/services/base.service";
+import type { PersonCreateDto } from "@/modules/person/dto/person.dto";
+import type { SelectItem, SelectSearchResult } from "@/shared/components/ui/input/select-item.types";
+import { maskCpf } from "@/shared/lib/input/cpf";
+import { digitsOnly } from "@/shared/lib/input/digits";
+
+const AUTOCOMPLETE_PAGE_SIZE = 6;
 
 class PersonService extends BaseService<Person, PersonCreateDto, PersonCreateDto> {
-    constructor() {
-        super("/api/v1/persons");
-    }
+  constructor() {
+    super("/api/v1/persons");
+  }
+
+  /** Busca paginada para autocomplete (máx. 6 por página). Filtra em memória até termos endpoint de busca no backend. */
+  async searchForAutocomplete(query: string, page = 0): Promise<SelectSearchResult> {
+    const all = await this.getAll();
+    const q = query.trim().toLowerCase();
+    const digits = digitsOnly(query);
+
+    const filtered = q
+      ? all.filter(
+          (p) =>
+            p.fullName.toLowerCase().includes(q) ||
+            (digits && p.cpf.includes(digits)) ||
+            p.socialName?.toLowerCase().includes(q),
+        )
+      : all;
+
+    const start = page * AUTOCOMPLETE_PAGE_SIZE;
+    const slice = filtered.slice(start, start + AUTOCOMPLETE_PAGE_SIZE);
+    const items: SelectItem[] = slice.map((p) => ({
+      value: p.id,
+      label: p.fullName,
+      description: maskCpf(p.cpf),
+    }));
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / AUTOCOMPLETE_PAGE_SIZE));
+
+    return {
+      items,
+      page,
+      hasMore: page + 1 < totalPages,
+    };
+  }
 }
 
 export const personService = new PersonService();
