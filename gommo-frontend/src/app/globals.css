@@ -102,7 +102,6 @@
     --sidebar-collapsed: 4.5rem;
     --header-height: 4rem;
     --sidebar-transition-duration: 500ms;
-    --sidebar-toggle-top: calc(var(--header-height) + 1.375rem);
 
     /* Controls — espelha .btn--m da referência */
     --gommo-control-h: 40px;
@@ -188,7 +187,7 @@ body {
 
 /* Card base — white panel with layered shadow */
 .surface-card,
-.surface-page-header{
+.surface-page-header {
     border-radius: var(--radius-gommo-card-lg);
     border: 1px solid color-mix(in srgb, var(--color-digital-blue-200) 60%, white);
     background: var(--color-base-100);
@@ -200,7 +199,7 @@ body {
     transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-[data-theme="dark"] .surface-card {
+[data-theme="dark"] .surface-card, .surface-page-header {
     border-color: color-mix(in srgb, var(--color-base-content) 10%, transparent);
     background: var(--color-base-100);
     box-shadow: 0 1px 1px color-mix(in srgb, black 22%, transparent),
@@ -592,17 +591,17 @@ aside[data-collapsed="true"] .sidebar-copy,
     transform: translateX(-4px);
 }
 
-/* Botão de recolher — sempre na borda direita do sidebar */
+/* Botão de recolher — centralizado na borda direita do sidebar */
 .sidebar-toggle-btn {
     position: absolute;
-    top: var(--sidebar-toggle-top);
+    top: calc(var(--header-height) + 1.875rem);
     right: 0;
-    z-index: 50;
+    z-index: 10;
     display: flex;
-    width: 2rem;
-    height: 2rem;
-    min-width: 2rem;
-    min-height: 2rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    min-width: 1.75rem;
+    min-height: 1.75rem;
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
@@ -611,24 +610,20 @@ aside[data-collapsed="true"] .sidebar-copy,
     border: 1px solid var(--sidebar-border);
     background: var(--color-base-100);
     color: color-mix(in srgb, var(--color-base-content) 45%, transparent);
-    box-shadow:
-        0 1px 2px color-mix(in srgb, var(--color-digital-blue-900) 6%, transparent),
-        0 4px 12px color-mix(in srgb, var(--color-digital-blue-500) 8%, transparent);
-    transform: translateX(50%);
-    transition:
-        background 0.2s ease,
-        color 0.2s ease,
-        box-shadow 0.2s ease,
-        top var(--sidebar-transition-duration) cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--color-digital-blue-900) 6%, transparent),
+    0 4px 10px color-mix(in srgb, var(--color-digital-blue-500) 8%, transparent);
     cursor: pointer;
+    transition: background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+    transform: translate(50%, -50%);
 }
 
 .sidebar-toggle-btn:hover {
     background: var(--color-digital-blue-50);
     color: var(--color-digital-blue-600);
-    box-shadow:
-        0 2px 4px color-mix(in srgb, var(--color-digital-blue-900) 8%, transparent),
-        0 6px 16px color-mix(in srgb, var(--color-digital-blue-500) 12%, transparent);
+    box-shadow: 0 2px 4px color-mix(in srgb, var(--color-digital-blue-900) 8%, transparent),
+    0 6px 16px color-mix(in srgb, var(--color-digital-blue-500) 12%, transparent);
 }
 
 .sidebar-search-flyout {
@@ -636,9 +631,8 @@ aside[data-collapsed="true"] .sidebar-copy,
     border-radius: var(--gommo-control-radius);
     border: 1px solid color-mix(in srgb, var(--color-digital-blue-200) 75%, transparent);
     background: var(--color-base-100);
-    box-shadow:
-        0 4px 6px color-mix(in srgb, var(--color-digital-blue-900) 4%, transparent),
-        0 12px 28px color-mix(in srgb, var(--color-digital-blue-500) 14%, transparent);
+    box-shadow: 0 4px 6px color-mix(in srgb, var(--color-digital-blue-900) 4%, transparent),
+    0 12px 28px color-mix(in srgb, var(--color-digital-blue-500) 14%, transparent);
 }
 
 .nav-item:hover {

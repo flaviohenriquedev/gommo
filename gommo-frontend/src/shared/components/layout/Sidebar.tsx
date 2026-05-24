@@ -34,6 +34,7 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
     const flat = useMemo(() => flattenRoutes(APP_ROUTES), []);
     const isSearching = query.trim().length > 0;
     const panelCollapsed = collapsed && !mobileOpen;
+    const searchFlyoutVisible = searchFlyoutOpen && panelCollapsed;
     const activeParentIds = useMemo(() => {
         const next = new Set<string>();
         for (const route of APP_ROUTES) {
@@ -63,14 +64,7 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
     }, [pathname, onMobileCloseAction]);
 
     useEffect(() => {
-        if (!panelCollapsed) {
-            setSearchFlyoutOpen(false);
-            setSearchFlyoutPos(null);
-        }
-    }, [panelCollapsed]);
-
-    useEffect(() => {
-        if (!searchFlyoutOpen) return;
+        if (!searchFlyoutVisible) return;
 
         const onKeyDown = (event: KeyboardEvent) => {
             if (event.key === "Escape") {
@@ -81,13 +75,13 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
 
         document.addEventListener("keydown", onKeyDown);
         return () => document.removeEventListener("keydown", onKeyDown);
-    }, [searchFlyoutOpen]);
+    }, [searchFlyoutVisible]);
 
     useEffect(() => {
-        if (searchFlyoutOpen) {
+        if (searchFlyoutVisible) {
             searchInputRef.current?.focus();
         }
-    }, [searchFlyoutOpen, searchFlyoutPos]);
+    }, [searchFlyoutVisible, searchFlyoutPos]);
 
     const openSearchFlyout = () => {
         const rect = searchTriggerRef.current?.getBoundingClientRect();
@@ -100,6 +94,11 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
     const closeSearchFlyout = () => {
         setSearchFlyoutOpen(false);
         setSearchFlyoutPos(null);
+    };
+
+    const handleToggle = () => {
+        closeSearchFlyout();
+        onToggleAction();
     };
 
     const toggleGroup = (id: string) => {
@@ -248,42 +247,56 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
                 )}
             </div>
 
-            {/* Search */}
-            <motion.div
-                layout
-                transition={{duration: 0.5, ease: [0.22, 1, 0.36, 1]}}
-                className="relative px-3 py-3"
-            >
-                {panelCollapsed ? (
+            {/* Search + toggle */}
+            <div className="flex items-center gap-2.5 px-3 py-3">
+                <div className={clsx("min-w-0", panelCollapsed ? "flex flex-1 justify-center" : "flex-1")}>
+                    {panelCollapsed ? (
+                        <button
+                            ref={searchTriggerRef}
+                            type="button"
+                            aria-label="Buscar no menu"
+                            aria-expanded={searchFlyoutVisible}
+                            onClick={openSearchFlyout}
+                            className={clsx(
+                                "flex size-9 shrink-0 items-center justify-center rounded-lg border bg-base-100 text-digital-blue-500 transition-colors duration-200",
+                                searchFlyoutVisible
+                                    ? "border-digital-blue-300 bg-digital-blue-50 text-digital-blue-600"
+                                    : "hover:border-digital-blue-200 hover:bg-digital-blue-50/70",
+                            )}
+                            style={{borderColor: searchFlyoutVisible ? undefined : "var(--sidebar-border)"}}
+                        >
+                            <Search className="size-3.5" strokeWidth={2}/>
+                        </button>
+                    ) : (
+                        <label className="gommo-field h-9! min-h-9! w-full rounded-lg! text-sm!">
+                            <Search className="size-3.5 shrink-0 text-digital-blue-400" strokeWidth={2}/>
+                            <input
+                                type="search"
+                                placeholder="Buscar no menu…"
+                                value={query}
+                                onChange={(e) => setQuery(e.target.value)}
+                                className="text-sm!"
+                            />
+                        </label>
+                    )}
+                </div>
+
+                {opts.desktop && (
                     <button
-                        ref={searchTriggerRef}
                         type="button"
-                        aria-label="Buscar no menu"
-                        aria-expanded={searchFlyoutOpen}
-                        onClick={openSearchFlyout}
-                        className={clsx(
-                            "mx-auto flex size-9 shrink-0 items-center justify-center rounded-lg border bg-base-100 text-digital-blue-500 transition-colors duration-200",
-                            searchFlyoutOpen
-                                ? "border-digital-blue-300 bg-digital-blue-50 text-digital-blue-600"
-                                : "hover:border-digital-blue-200 hover:bg-digital-blue-50/70",
-                        )}
-                        style={{borderColor: searchFlyoutOpen ? undefined : "var(--sidebar-border)"}}
+                        onClick={handleToggle}
+                        aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
+                        className="sidebar-toggle-btn shrink-0"
                     >
-                        <Search className="size-3.5" strokeWidth={2}/>
-                    </button>
-                ) : (
-                    <label className="gommo-field h-9! min-h-9! rounded-lg! text-sm!">
-                        <Search className="size-3.5 shrink-0 text-digital-blue-400" strokeWidth={2}/>
-                        <input
-                            type="search"
-                            placeholder="Buscar no menu…"
-                            value={query}
-                            onChange={(e) => setQuery(e.target.value)}
-                            className="text-sm!"
+                        <ChevronLeft
+                            className={clsx(
+                                "size-3.5 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+                                collapsed && "rotate-180",
+                            )}
                         />
-                    </label>
+                    </button>
                 )}
-            </motion.div>
+            </div>
 
             {/* Nav */}
             <nav
@@ -350,21 +363,10 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
                 style={{background: "var(--sidebar-bg)", borderColor: "var(--sidebar-border)"}}
             >
                 {sidebarPanel({desktop: true})}
-
-                <button
-                    type="button"
-                    onClick={onToggleAction}
-                    aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
-                    className="sidebar-toggle-btn hidden lg:flex"
-                >
-                    <ChevronLeft
-                        className={clsx("size-3.5 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]", collapsed && "rotate-180")}
-                    />
-                </button>
             </aside>
 
             <AnimatePresence>
-                {searchFlyoutOpen && searchFlyoutPos && panelCollapsed && (
+                {searchFlyoutVisible && searchFlyoutPos && (
                     <>
                         <motion.button
                             type="button"
@@ -373,7 +375,7 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
                             animate={{opacity: 1}}
                             exit={{opacity: 0}}
                             transition={{duration: 0.15}}
-                            className="fixed inset-0 z-[60] bg-transparent"
+                            className="fixed inset-0 z-60 bg-transparent"
                             onClick={closeSearchFlyout}
                         />
                         <motion.div
@@ -383,11 +385,11 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
                             animate={{opacity: 1, x: 0, scale: 1}}
                             exit={{opacity: 0, x: -6, scale: 0.98}}
                             transition={{duration: 0.2, ease: [0.22, 1, 0.36, 1]}}
-                            className="sidebar-search-flyout fixed z-[70] p-2"
+                            className="sidebar-search-flyout fixed z-70 p-2"
                             style={{top: searchFlyoutPos.top, left: searchFlyoutPos.left}}
                             onMouseDown={(e) => e.stopPropagation()}
                         >
-                            <label className="gommo-field h-9! min-h-9! w-[15rem] rounded-lg! text-sm!">
+                            <label className="gommo-field h-9! min-h-9! w-60 rounded-lg! text-sm!">
                                 <Search className="size-3.5 shrink-0 text-digital-blue-400" strokeWidth={2}/>
                                 <input
                                     ref={searchInputRef}
