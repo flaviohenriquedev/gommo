@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import { motion } from "framer-motion";
-import { Plus } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
 import {
   createContext,
   useCallback,
@@ -11,7 +11,13 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useQueryRefresh } from "@/shared/components/data/QueryRefreshContext";
 import { Button } from "@/shared/components/ui/Button";
+import { useTabbedCrudConfigOptional } from "@/shared/workspace/TabbedCrudConfigContext";
+import { useWorkspaceTabOptional } from "@/shared/workspace/WorkspaceTabContext";
+import { useWorkspaceNavigation } from "@/shared/workspace/useWorkspaceNavigation";
+import { useWorkspaceStore } from "@/shared/workspace/workspace.store";
+import { isModuleListTab } from "@/shared/workspace/workspace-tab-id";
 
 export const CRUD_TAB_LIST = "list";
 export const CRUD_TAB_FORM = "form";
@@ -30,7 +36,7 @@ type CrudScreenContextValue = {
   goToForm: () => void;
   goToTab: (tabId: string) => void;
   startCreate: () => void;
-  startEdit: (id: string) => void;
+  startEdit: (id: string, record?: object) => void;
 };
 
 const CrudScreenContext = createContext<CrudScreenContextValue | null>(null);
@@ -52,6 +58,9 @@ export type CrudScreenProps = {
   showListToFormButton?: boolean;
   listToFormLabel?: string;
   defaultTab?: string;
+  initialEditingId?: string | null;
+  /** Sincroniza título da aba do módulo e URL ao alternar listagem/cadastro. */
+  workspaceEnabled?: boolean;
 };
 
 export function CrudScreen({
@@ -65,11 +74,40 @@ export function CrudScreen({
   showListToFormButton = true,
   listToFormLabel = "Novo cadastro",
   defaultTab = CRUD_TAB_LIST,
+  initialEditingId = null,
+  workspaceEnabled = false,
 }: CrudScreenProps) {
   const [activeTab, setActiveTab] = useState(defaultTab);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(initialEditingId);
+  const crudConfig = useTabbedCrudConfigOptional();
+  const workspaceTabCtx = useWorkspaceTabOptional();
+  const { syncCrudUrl } = useWorkspaceNavigation();
+  const clearTitleSuffix = useWorkspaceStore((s) => s.clearTitleSuffix);
+  const setTitleSuffix = useWorkspaceStore((s) => s.setTitleSuffix);
 
   const isEditing = editingId != null;
+  const isListInstance =
+    workspaceTabCtx == null || isModuleListTab(workspaceTabCtx.tab.entityKey);
+
+  const syncWorkspace = useCallback(
+    (crud: { editingId?: string | null; isNew?: boolean; titleSuffix?: string | null }) => {
+      if (!workspaceEnabled || !crudConfig || !workspaceTabCtx) return;
+      const tabId = workspaceTabCtx.tab.id;
+      if (!isListInstance) return;
+      if (crud.titleSuffix) setTitleSuffix(tabId, crud.titleSuffix);
+      else clearTitleSuffix(tabId);
+      syncCrudUrl(tabId, { editingId: crud.editingId, isNew: crud.isNew });
+    },
+    [
+      clearTitleSuffix,
+      crudConfig,
+      isListInstance,
+      setTitleSuffix,
+      syncCrudUrl,
+      workspaceEnabled,
+      workspaceTabCtx,
+    ],
+  );
 
   const tabs = useMemo(
     () => [
@@ -83,10 +121,36 @@ export function CrudScreen({
     [activeTab, extraTabs, formTabLabel, formTabLabelEdit, isEditing, listTabLabel],
   );
 
-  const goToList = useCallback(() => { setEditingId(null); setActiveTab(CRUD_TAB_LIST); }, []);
+  const goToList = useCallback(() => {
+    setEditingId(null);
+    setActiveTab(CRUD_TAB_LIST);
+    syncWorkspace({});
+  }, [syncWorkspace]);
+
   const goToForm = useCallback(() => setActiveTab(CRUD_TAB_FORM), []);
-  const startCreate = useCallback(() => { setEditingId(null); setActiveTab(CRUD_TAB_FORM); }, []);
-  const startEdit = useCallback((id: string) => { setEditingId(id); setActiveTab(CRUD_TAB_FORM); }, []);
+
+  const startCreate = useCallback(() => {
+    setEditingId(null);
+    setActiveTab(CRUD_TAB_FORM);
+    syncWorkspace({ isNew: true });
+  }, [syncWorkspace]);
+
+  const startEdit = useCallback(
+    (id: string, record?: object) => {
+      const titleSuffix =
+        crudConfig?.fieldTabName && record
+          ? String((record as Record<string, unknown>)[crudConfig.fieldTabName] ?? "")
+          : undefined;
+      setEditingId(id);
+      setActiveTab(CRUD_TAB_FORM);
+      syncWorkspace({
+        editingId: id,
+        titleSuffix: titleSuffix || undefined,
+      });
+    },
+    [crudConfig?.fieldTabName, syncWorkspace],
+  );
+
   const goToTab = useCallback((tabId: string) => setActiveTab(tabId), []);
 
   const ctx = useMemo(
@@ -101,13 +165,14 @@ export function CrudScreen({
         ? form
         : extraTabs.find((t) => t.id === activeTab)?.content ?? null;
 
+  const queryRefresh = useQueryRefresh();
+
   return (
     <CrudScreenContext.Provider value={ctx}>
-      <div className="flex flex-col">
+      <div className="flex min-h-0 flex-1 flex-col">
 
-        {/* ── Tab bar ── */}
         <div
-          className="flex items-center gap-0.5 overflow-x-auto overflow-y-hidden border-b border-digital-blue-100/70 px-4 pt-0.5"
+          className="crud-tablist flex items-center gap-0.5 overflow-x-auto overflow-y-hidden border-b px-4 pt-0.5"
           role="tablist"
           aria-label="Seções do cadastro"
         >
@@ -121,12 +186,18 @@ export function CrudScreen({
                 aria-selected={selected}
                 aria-controls={`crud-panel-${tab.id}`}
                 id={`crud-tab-${tab.id}`}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => {
+                  if (tab.id === CRUD_TAB_LIST) goToList();
+                  else if (tab.id === CRUD_TAB_FORM) {
+                    setActiveTab(CRUD_TAB_FORM);
+                    if (workspaceEnabled && !editingId) syncWorkspace({ isNew: true });
+                  } else setActiveTab(tab.id);
+                }}
                 className={clsx(
-                  "relative shrink-0 rounded-t-[6px] px-3 py-2 text-[13px] transition-colors duration-150",
+                  "relative shrink-0 cursor-pointer rounded-t-[6px] px-3 py-2 text-[13px] transition-colors duration-150",
                   selected
-                    ? "font-semibold text-digital-blue-600"
-                    : "font-medium text-base-content/40 hover:text-base-content/70",
+                    ? "font-semibold text-digital-blue-600 dark:text-primary"
+                    : "font-medium text-base-content/45 hover:text-base-content/75",
                 )}
               >
                 {tab.label}
@@ -142,31 +213,48 @@ export function CrudScreen({
           })}
         </div>
 
-        {/* ── Panel ── */}
         <div
           id={`crud-panel-${activeTab}`}
           role="tabpanel"
           aria-labelledby={`crud-tab-${activeTab}`}
-          className="min-h-[12rem]"
+          className="flex min-h-0 flex-1 flex-col overflow-hidden"
         >
           {activeTab === CRUD_TAB_LIST && (
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-digital-blue-100/50 bg-digital-blue-50/30 px-4 py-2.5">
-              <div className="text-[13px] text-base-content/45">
+            <div className="crud-list-toolbar flex flex-wrap items-center justify-between gap-3 border-b px-4 py-2.5">
+              <div className="text-[13px] text-base-content/50">
                 {listToolbar ?? "Consulte os registros ou inicie um novo cadastro."}
               </div>
-              {showListToFormButton && (
-                <Button
-                  size="sm"
-                  leftIcon={<Plus className="size-3.5" strokeWidth={2.5} />}
-                  onClick={startCreate}
-                >
-                  {listToFormLabel}
-                </Button>
-              )}
+              <div className="flex shrink-0 items-center gap-2">
+                {queryRefresh && (
+                  <Button
+                    variant="success"
+                    size="sm"
+                    aria-label="Atualizar lista"
+                    className="gommo-btn--icon-only"
+                    disabled={queryRefresh.isFetching}
+                    onClick={() => queryRefresh.refetch()}
+                    leftIcon={
+                      <RefreshCw
+                        className={clsx("size-3.5", queryRefresh.isFetching && "animate-spin")}
+                        strokeWidth={2.25}
+                      />
+                    }
+                  />
+                )}
+                {showListToFormButton && (
+                  <Button
+                    size="sm"
+                    leftIcon={<Plus className="size-3.5" strokeWidth={2.5} />}
+                    onClick={startCreate}
+                  >
+                    {listToFormLabel}
+                  </Button>
+                )}
+              </div>
             </div>
           )}
 
-          {panel}
+          <div className="min-h-0 flex-1 overflow-y-auto">{panel}</div>
         </div>
       </div>
     </CrudScreenContext.Provider>

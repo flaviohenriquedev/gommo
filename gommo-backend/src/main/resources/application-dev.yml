@@ -11,6 +11,9 @@ spring:
 gommo:
   cors:
     allowed-origins: http://localhost:3000
+  storage:
+    local-base-path: ${STORAGE_LOCAL_PATH:./data/storage}
+    bucket: gommo-local
   dev:
     admin-username: ${DEV_ADMIN_USERNAME:admin}
     admin-password: ${DEV_ADMIN_PASSWORD}

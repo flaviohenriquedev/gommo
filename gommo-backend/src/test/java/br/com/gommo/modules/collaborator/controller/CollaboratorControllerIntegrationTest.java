@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import br.com.gommo.support.AbstractIntegrationTest;
 import com.jayway.jsonpath.JsonPath;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class CollaboratorControllerIntegrationTest extends AbstractIntegrationTest {
@@ -13,30 +12,17 @@ class CollaboratorControllerIntegrationTest extends AbstractIntegrationTest {
 
     private String accessToken;
 
-    private void authenticateAndPrepare() throws Exception {
+    private void authenticate() throws Exception {
         var body =
                 "{\"username\":\"%s\",\"password\":\"%s\"}".formatted(TEST_ADMIN_USERNAME, testAdminPassword);
         var login = postJson("/api/v1/auth/login", body, null);
         assertThat(login.statusCode()).isEqualTo(200);
         accessToken = JsonPath.read(login.body(), "$.accessToken");
-        cleanupTestCollaborator();
-    }
-
-    /** Remove registro de execuções anteriores (mesmo CPF) para o fluxo CRUD ficar determinístico. */
-    private void cleanupTestCollaborator() throws Exception {
-        var list = get("/api/v1/collaborators", accessToken);
-        if (list.statusCode() != 200) {
-            return;
-        }
-        List<String> ids = JsonPath.read(list.body(), "$.[?(@.cpf == '" + TEST_CPF + "')].id");
-        for (String id : ids) {
-            delete("/api/v1/collaborators/" + id, accessToken);
-        }
     }
 
     @Test
-    void crudFlow_shouldWorkWithBaseControllerEndpoints() throws Exception {
-        authenticateAndPrepare();
+    void directCreate_shouldBeRejected() throws Exception {
+        authenticate();
 
         var created = postJson(
                 "/api/v1/collaborators",
@@ -46,33 +32,17 @@ class CollaboratorControllerIntegrationTest extends AbstractIntegrationTest {
                         .formatted(TEST_CPF),
                 accessToken);
 
-        assertThat(created.statusCode()).isEqualTo(201);
-        String collaboratorId = JsonPath.read(created.body(), "$.id");
+        assertThat(created.statusCode()).isEqualTo(400);
+        assertThat((String) JsonPath.read(created.body(), "$.code"))
+                .isEqualTo("COLLABORATOR_DIRECT_CREATE_NOT_ALLOWED");
+    }
 
-        var byId = get("/api/v1/collaborators/" + collaboratorId, accessToken);
-        assertThat(byId.statusCode()).isEqualTo(200);
-        assertThat((String) JsonPath.read(byId.body(), "$.fullName")).isEqualTo("Maria Silva");
+    @Test
+    void findAdmitted_shouldReturnOk() throws Exception {
+        authenticate();
 
-        var list = get("/api/v1/collaborators", accessToken);
-        assertThat(list.statusCode()).isEqualTo(200);
-        assertThat(JsonPath.<List<String>>read(list.body(), "$[*].id")).contains(collaboratorId);
-
-        var updated = putJson(
-                "/api/v1/collaborators/" + collaboratorId,
-                """
-                {"fullName":"Maria Silva Santos","cpf":"%s","birthDate":"1990-05-15"}
-                """
-                        .formatted(TEST_CPF),
-                accessToken);
-
-        assertThat(updated.statusCode()).isEqualTo(200);
-        assertThat((String) JsonPath.read(updated.body(), "$.fullName")).isEqualTo("Maria Silva Santos");
-
-        var deleted = delete("/api/v1/collaborators/" + collaboratorId, accessToken);
-        assertThat(deleted.statusCode()).isEqualTo(204);
-
-        var afterDelete = get("/api/v1/collaborators/" + collaboratorId, accessToken);
-        assertThat(afterDelete.statusCode()).isEqualTo(404);
+        var admitted = get("/api/v1/collaborators/admitted", accessToken);
+        assertThat(admitted.statusCode()).isEqualTo(200);
     }
 
     @Test

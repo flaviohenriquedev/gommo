@@ -201,6 +201,7 @@ export function InputSelectAutocomplete({
           className={clsx(
             "gommo-field",
             fieldClass(disabled, false, Boolean(error)),
+            !value && !open && "gommo-select-trigger--placeholder",
             className,
           )}
         >

@@ -14,6 +14,8 @@ const DEBOUNCE_MS = 300;
 
 export type InputAutocompleteProps = InputFieldChromeProps & {
     value?: string;
+    /** Rótulo exibido quando `value` já está definido (ex.: edição). */
+    selectedLabel?: string;
     onValueChange: (value: string, item?: SelectItem) => void;
     onSearch: SelectSearchFn;
     placeholder?: string;
@@ -24,6 +26,7 @@ export type InputAutocompleteProps = InputFieldChromeProps & {
 
 export function InputAutocomplete({
                                       value,
+                                      selectedLabel: selectedLabelProp,
                                       onValueChange,
                                       onSearch,
                                       placeholder = "Buscar...",
@@ -96,6 +99,16 @@ export function InputAutocomplete({
             if (debounceRef.current) clearTimeout(debounceRef.current);
         };
     }, []);
+
+    useEffect(() => {
+        if (!value) {
+            setSelectedLabel("");
+            return;
+        }
+        if (!open && selectedLabelProp !== undefined) {
+            setSelectedLabel(selectedLabelProp);
+        }
+    }, [value, selectedLabelProp, open]);
 
     const pick = useCallback(
         (item: SelectItem) => {

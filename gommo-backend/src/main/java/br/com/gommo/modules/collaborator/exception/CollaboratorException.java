@@ -18,4 +18,11 @@ public final class CollaboratorException {
                 CollaboratorExceptions.CPF_ALREADY_EXISTS_MSG,
                 HttpStatus.CONFLICT);
     }
+
+    public static BusinessException directCreateNotAllowed() {
+        return new BusinessException(
+                CollaboratorExceptions.DIRECT_CREATE_NOT_ALLOWED_CODE,
+                CollaboratorExceptions.DIRECT_CREATE_NOT_ALLOWED_MSG,
+                HttpStatus.BAD_REQUEST);
+    }
 }

@@ -46,7 +46,7 @@ export function HeaderUserMenu() {
         onClick={() => setOpen((v) => !v)}
         className={clsx(
           "flex items-center gap-2 rounded-[10px] py-1 ps-1 pe-2.5 transition-colors duration-150",
-          open ? "bg-digital-blue-50" : "hover:bg-base-200/70",
+          open ? "bg-digital-blue-50 dark:bg-primary/15" : "hover:bg-base-200/70 dark:hover:bg-base-300/40",
         )}
       >
         {/* Avatar */}
@@ -98,7 +98,7 @@ export function HeaderUserMenu() {
               </div>
             </div>
 
-            <div className="my-1 h-px bg-digital-blue-100/70" />
+            <div className="my-1 h-px bg-digital-blue-100/70 dark:bg-base-content/10" />
 
             {/* Settings (placeholder) */}
             <button
@@ -110,7 +110,7 @@ export function HeaderUserMenu() {
               Configurações
             </button>
 
-            <div className="my-1 h-px bg-digital-blue-100/70" />
+            <div className="my-1 h-px bg-digital-blue-100/70 dark:bg-base-content/10" />
 
             {/* Sign out */}
             <button

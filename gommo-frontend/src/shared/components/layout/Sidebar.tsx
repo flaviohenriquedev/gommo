@@ -2,16 +2,16 @@
 
 import clsx from "clsx";
 import {AnimatePresence, motion} from "framer-motion";
-import {ChevronLeft, ChevronRight, Search} from "lucide-react";
-import Link from "next/link";
+import {ChevronRight, Search} from "lucide-react";
 import {usePathname} from "next/navigation";
-import {useEffect, useMemo, useRef, useState} from "react";
+import {useEffect, useMemo, useRef, useState, type MouseEvent} from "react";
 import {APP_ROUTES, type AppRoute, flattenRoutes, NAV_SECTIONS} from "@/config/routes";
 import {SidebarFlyout} from "@/shared/components/layout/SidebarFlyout";
+import {useWorkspaceNavigation} from "@/shared/workspace/useWorkspaceNavigation";
+import {useWorkspaceStore} from "@/shared/workspace/workspace.store";
 
 type SidebarProps = {
     collapsed: boolean;
-    onToggleAction: () => void;
     mobileOpen?: boolean;
     onMobileCloseAction?: () => void;
 };
@@ -21,8 +21,13 @@ function routeIsActive(route: AppRoute, pathname: string): boolean {
     return route.children?.some((c) => c.href === pathname) ?? false;
 }
 
-export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobileCloseAction}: SidebarProps) {
+export function Sidebar({collapsed, mobileOpen = false, onMobileCloseAction}: SidebarProps) {
     const pathname = usePathname();
+    const {openRouteModule} = useWorkspaceNavigation();
+    const activeWorkspaceTab = useWorkspaceStore((s) =>
+        s.tabs.find((t) => t.id === s.activeTabId),
+    );
+    const navActiveHref = activeWorkspaceTab?.href ?? pathname;
     const [query, setQuery] = useState("");
     const [openIds, setOpenIds] = useState<Set<string>>(new Set());
     const [flyout, setFlyout] = useState<{ route: AppRoute; top: number } | null>(null);
@@ -35,13 +40,12 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
     const isSearching = query.trim().length > 0;
     const panelCollapsed = collapsed && !mobileOpen;
     const searchFlyoutVisible = searchFlyoutOpen && panelCollapsed;
-    const activeParentIds = useMemo(() => {
-        const next = new Set<string>();
-        for (const route of APP_ROUTES) {
-            if (route.children?.some((c) => c.href === pathname)) next.add(route.id);
-        }
-        return next;
-    }, [pathname]);
+    const openRouteFromMenu = (route: AppRoute, event?: MouseEvent) => {
+        event?.preventDefault();
+        if (!route.href) return;
+        openRouteModule(route);
+        onMobileCloseAction?.();
+    };
 
     const filteredSections = useMemo(() => {
         if (!isSearching) return NAV_SECTIONS;
@@ -65,14 +69,12 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
 
     useEffect(() => {
         if (!searchFlyoutVisible) return;
-
         const onKeyDown = (event: KeyboardEvent) => {
             if (event.key === "Escape") {
                 setSearchFlyoutOpen(false);
                 setSearchFlyoutPos(null);
             }
         };
-
         document.addEventListener("keydown", onKeyDown);
         return () => document.removeEventListener("keydown", onKeyDown);
     }, [searchFlyoutVisible]);
@@ -86,7 +88,6 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
     const openSearchFlyout = () => {
         const rect = searchTriggerRef.current?.getBoundingClientRect();
         if (!rect) return;
-
         setSearchFlyoutPos({top: rect.top, left: rect.right + 10});
         setSearchFlyoutOpen(true);
     };
@@ -94,11 +95,6 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
     const closeSearchFlyout = () => {
         setSearchFlyoutOpen(false);
         setSearchFlyoutPos(null);
-    };
-
-    const handleToggle = () => {
-        closeSearchFlyout();
-        onToggleAction();
     };
 
     const toggleGroup = (id: string) => {
@@ -110,19 +106,20 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
         });
     };
 
-    const isOpen = (id: string) => isSearching || activeParentIds.has(id) || openIds.has(id);
+    /** Expansão só por clique do usuário (ou busca); troca de aba não abre/fecha grupos. */
+    const isOpen = (id: string) => isSearching || openIds.has(id);
 
     const NavLink = ({route, nested}: { route: AppRoute; nested?: boolean }) => {
         const Icon = route.icon;
-        const active = route.href === pathname;
+        const active = route.href === navActiveHref;
 
         return (
-            <Link
-                href={route.href ?? "#"}
+            <button
+                type="button"
                 title={route.label}
-                onClick={() => onMobileCloseAction?.()}
+                onClick={(e) => openRouteFromMenu(route, e)}
                 className={clsx(
-                    "nav-item group",
+                    "nav-item group w-full",
                     nested && "nav-item-child",
                     panelCollapsed && !nested && "nav-item-collapsed",
                     active && "nav-item-active",
@@ -138,14 +135,14 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
                     strokeWidth={active ? 2.25 : 2}
                 />
                 <span className="sidebar-copy truncate">{route.label}</span>
-            </Link>
+            </button>
         );
     };
 
     const renderRoute = (route: AppRoute) => {
         const Icon = route.icon;
         const hasChildren = Boolean(route.children?.length);
-        const active = routeIsActive(route, pathname);
+        const active = routeIsActive(route, navActiveHref);
         const expanded = isOpen(route.id);
 
         if (panelCollapsed && hasChildren) {
@@ -181,7 +178,7 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
         }
 
         return (
-            <li key={route.id} className="grid gap-0.5">
+            <li key={route.id} className="grid gap-1">
                 <button
                     type="button"
                     onClick={() => toggleGroup(route.id)}
@@ -207,7 +204,7 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
                             animate={{height: "auto", opacity: 1}}
                             exit={{height: 0, opacity: 0}}
                             transition={{duration: 0.2, ease: [0.22, 1, 0.36, 1]}}
-                            className="overflow-hidden"
+                            className="nav-group-children flex flex-col gap-0.5 overflow-hidden"
                         >
                             {route.children?.map((child) => (
                                 <li key={child.id}>
@@ -225,30 +222,39 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
         <>
             {/* Logo area */}
             <div
-                className="flex h-(--header-height) shrink-0 items-center gap-3 border-b px-4 bg-base-200"
-                style={{borderColor: "var(--sidebar-border)"}}
+                className="flex h-(--header-height) shrink-0 items-center gap-3 border-b px-4"
+                style={{borderColor: "var(--sidebar-border)", background: "var(--sidebar-bg)"}}
             >
-                <div
-                    className="flex size-8 shrink-0 items-center justify-center rounded-lg shadow-sm"
-                    style={{
-                        background: "linear-gradient(135deg, var(--color-digital-blue-500) 0%, var(--color-digital-blue-700) 100%)",
-                        boxShadow: "0 2px 8px color-mix(in srgb, var(--color-digital-blue-600) 35%, transparent), inset 0 1px 0 rgba(255,255,255,0.18)",
-                    }}
-                >
-                    <span className="text-[13px] font-bold tracking-tight text-white">G</span>
-                </div>
-                {!collapsed && (
-                    <div className="sidebar-copy min-w-0 flex-1">
-                        <p className="truncate text-[13px] font-bold tracking-tight text-base-content">Gommo</p>
-                        <p className="text-[9.5px] font-semibold uppercase tracking-[0.13em] text-base-content/35">
-                            Departamento Pessoal
-                        </p>
-                    </div>
+                {panelCollapsed ? (
+                    <img
+                        src="/brand/gommo-logo-icon.png"
+                        alt="Gommo"
+                        width={32}
+                        height={32}
+                        className="h-8 w-8 shrink-0 rounded-lg object-contain"
+                    />
+                ) : (
+                    <>
+                        <img
+                            src="/brand/gommo-logo-full.png"
+                            alt="Gommo"
+                            width={160}
+                            height={44}
+                            className="sidebar-logo-light h-9 w-auto max-w-[160px] shrink-0 object-contain object-left"
+                        />
+                        <img
+                            src="/brand/gommo-logo-white.png"
+                            alt="Gommo"
+                            width={160}
+                            height={44}
+                            className="sidebar-logo-dark h-9 w-auto max-w-[160px] shrink-0 object-contain object-left"
+                        />
+                    </>
                 )}
             </div>
 
             {/* Search + toggle */}
-            <div className="flex items-center gap-2.5 px-3 py-3">
+            <div className="sidebar-toolbar flex items-center px-3 py-3">
                 <div className={clsx("min-w-0", panelCollapsed ? "flex flex-1 justify-center" : "flex-1")}>
                     {panelCollapsed ? (
                         <button
@@ -260,8 +266,8 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
                             className={clsx(
                                 "flex size-9 shrink-0 items-center justify-center rounded-lg border bg-base-100 text-digital-blue-500 transition-colors duration-200",
                                 searchFlyoutVisible
-                                    ? "border-digital-blue-300 bg-digital-blue-50 text-digital-blue-600"
-                                    : "hover:border-digital-blue-200 hover:bg-digital-blue-50/70",
+                                    ? "border-digital-blue-300 bg-digital-blue-50 text-digital-blue-600 dark:border-primary/35 dark:bg-primary/15 dark:text-primary"
+                                    : "hover:border-digital-blue-200 hover:bg-digital-blue-50/70 dark:hover:border-primary/25 dark:hover:bg-primary/10",
                             )}
                             style={{borderColor: searchFlyoutVisible ? undefined : "var(--sidebar-border)"}}
                         >
@@ -272,7 +278,7 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
                             <Search className="size-3.5 shrink-0 text-digital-blue-400" strokeWidth={2}/>
                             <input
                                 type="search"
-                                placeholder="Buscar no menu…"
+                                placeholder="Buscar no menu..."
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
                                 className="text-sm!"
@@ -281,45 +287,29 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
                     )}
                 </div>
 
-                {opts.desktop && (
-                    <button
-                        type="button"
-                        onClick={handleToggle}
-                        aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
-                        className="sidebar-toggle-btn shrink-0"
-                    >
-                        <ChevronLeft
-                            className={clsx(
-                                "size-3.5 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
-                                collapsed && "rotate-180",
-                            )}
-                        />
-                    </button>
-                )}
             </div>
 
             {/* Nav */}
-            <nav
-                className="flex-1 space-y-4 overflow-y-auto px-3 py-2 "
-                aria-label="Navegação principal"
-            >
-                {filteredSections.map((section) => (
-                    <div key={section.id}>
-                        <div className={`flex flex-col`}>
-                            <div className={`flex items-center min-h-6 px-3`}>
-                                {panelCollapsed ? (
-                                    <div className="nav-section-rule" aria-hidden="true"/>
-                                ) : (
-                                    <p className="nav-section-label">{section.label}</p>
-                                )}
+            <div className="sidebar-nav-wrap min-h-0 flex-1">
+                <nav className="sidebar-nav space-y-4 px-3 py-2" aria-label="Navegacao principal">
+                    {filteredSections.map((section) => (
+                        <div key={section.id}>
+                            <div className="flex flex-col">
+                                <div className="flex min-h-6 items-center px-3">
+                                    {panelCollapsed ? (
+                                        <div className="nav-section-rule" aria-hidden="true"/>
+                                    ) : (
+                                        <p className="nav-section-label">{section.label}</p>
+                                    )}
+                                </div>
+                                <ul className="space-y-0.5">
+                                    {section.routes.map(renderRoute)}
+                                </ul>
                             </div>
-                            <ul className="space-y-0.5">
-                                {section.routes.map(renderRoute)}
-                            </ul>
                         </div>
-                    </div>
-                ))}
-            </nav>
+                    ))}
+                </nav>
+            </div>
         </>
     );
 
@@ -357,7 +347,7 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
             <aside
                 data-collapsed={collapsed ? "true" : undefined}
                 className={clsx(
-                    "fixed top-0 z-40 hidden h-screen flex-col overflow-visible border-r transition-[width] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:flex",
+                    "fixed top-0 z-40 hidden h-screen flex-col overflow-hidden border-r transition-[width] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:flex",
                     collapsed ? "w-(--sidebar-collapsed)" : "w-(--sidebar-width)",
                 )}
                 style={{background: "var(--sidebar-bg)", borderColor: "var(--sidebar-border)"}}
@@ -394,7 +384,7 @@ export function Sidebar({collapsed, onToggleAction, mobileOpen = false, onMobile
                                 <input
                                     ref={searchInputRef}
                                     type="search"
-                                    placeholder="Buscar no menu…"
+                                    placeholder="Buscar no menu..."
                                     value={query}
                                     onChange={(e) => setQuery(e.target.value)}
                                     className="text-sm!"

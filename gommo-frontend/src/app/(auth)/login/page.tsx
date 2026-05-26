@@ -21,9 +21,13 @@ export default function LoginPage() {
         />
 
         <div className="relative z-10 flex flex-1 flex-col justify-center px-14 xl:px-20">
-          <div className="mb-8 flex size-12 items-center justify-center rounded-[10px] bg-white/15 shadow-lg backdrop-blur-sm">
-            <span className="text-base font-bold text-white">G</span>
-          </div>
+            <img
+              src="/brand/gommo-logo-full.png"
+              alt="Gommo"
+              width={180}
+              height={48}
+              className="login-hero-logo mb-8 h-12 w-auto max-w-[180px] object-contain object-left"
+            />
           <h1 className="max-w-lg text-4xl font-bold leading-[1.08] tracking-tight text-white xl:text-[2.75rem]">
             RH moderno para equipes que exigem precisão.
           </h1>
@@ -44,10 +48,14 @@ export default function LoginPage() {
 
         <div className="w-full max-w-[24rem]">
           <div className="mb-8 text-center lg:hidden">
-            <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-[10px] bg-digital-blue-600 shadow-sm">
-              <span className="text-base font-bold text-white">G</span>
-            </div>
-            <h1 className="text-xl font-bold tracking-tight">Gommo</h1>
+            <img
+              src="/brand/gommo-logo-full.png"
+              alt="Gommo"
+              width={140}
+              height={40}
+              className="mx-auto mb-3 h-10 w-auto max-w-[140px] object-contain"
+            />
+            <h1 className="sr-only">Gommo</h1>
             <p className="mt-0.5 text-sm text-base-content/50">Departamento Pessoal</p>
           </div>
 

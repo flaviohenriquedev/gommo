@@ -82,7 +82,7 @@ export function InputSelect({
                     className={clsx(
                         "gommo-field w-full cursor-pointer text-left",
                         fieldClass(disabled, false, Boolean(error)),
-                        !selected && "text-base-content/45",
+                        !selected && "gommo-select-trigger--placeholder",
                         className,
                     )}
                     onClick={() => !disabled && setOpen((v) => !v)}

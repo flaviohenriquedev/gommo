@@ -9,10 +9,17 @@
  *      <PersonAsyncSection promise={fetchFn()} />
  *    </Suspense>
  *
- * 3) Client + React Query:
- *    <QueryPanel queryKey={keys} request={fetchFn}>{({ data }) => <View data={data} />}</QueryPanel>
+ * 3) Client + React Query (lista):
+ *    <QueryTablePanel queryKey={keys} request={fetchFn} columns={cols} onRowActivate={...} />
+ *    ou <QueryPanel>{({ data }) => <DataTable data={data} onRowActivate={...} />}</QueryPanel>
  */
 
 export {DataRequest} from "@/shared/components/data/DataRequest";
 export {AsyncResult, useAsyncData} from "@/shared/components/data/DataResult";
-export {QueryPanel, type QueryPanelRenderProps} from "@/shared/components/data/QueryPanel";
+export {
+  QueryPanel,
+  QueryTablePanel,
+  type QueryPanelRenderProps,
+  type QueryTablePanelProps,
+  type QueryTablePanelTableProps,
+} from "@/shared/components/data/QueryPanel";

@@ -7,8 +7,11 @@ import br.com.gommo.modules.collaborator.exception.CollaboratorException;
 import br.com.gommo.modules.collaborator.dto.CollaboratorRequestDto;
 import br.com.gommo.modules.collaborator.dto.CollaboratorResponseDto;
 import br.com.gommo.modules.collaborator.entity.Collaborator;
+import br.com.gommo.modules.admission.entity.AdmissionStatusEnum;
+import br.com.gommo.modules.admission.repository.AdmissionProcessRepository;
 import br.com.gommo.modules.collaborator.mapper.CollaboratorMapper;
 import br.com.gommo.modules.collaborator.repository.CollaboratorRepository;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,11 +23,16 @@ public class CollaboratorService extends BaseService<Collaborator, CollaboratorR
 
     private final CollaboratorRepository CollaboratorRepository;
     private final CollaboratorMapper CollaboratorMapper;
+    private final AdmissionProcessRepository admissionProcessRepository;
 
-    public CollaboratorService(CollaboratorRepository CollaboratorRepository, CollaboratorMapper CollaboratorMapper) {
+    public CollaboratorService(
+            CollaboratorRepository CollaboratorRepository,
+            CollaboratorMapper CollaboratorMapper,
+            AdmissionProcessRepository admissionProcessRepository) {
         super(CollaboratorRepository, CollaboratorMapper::toResponse, CollaboratorMapper::toEntity);
         this.CollaboratorRepository = CollaboratorRepository;
         this.CollaboratorMapper = CollaboratorMapper;
+        this.admissionProcessRepository = admissionProcessRepository;
     }
 
     @Override
@@ -36,7 +44,7 @@ public class CollaboratorService extends BaseService<Collaborator, CollaboratorR
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasAuthority('collaborator:read')")
+    @PreAuthorize("hasAnyAuthority('collaborator:read', 'collaborator:picker')")
     public CollaboratorResponseDto findById(UUID id) {
         return super.findById(id);
     }
@@ -49,15 +57,26 @@ public class CollaboratorService extends BaseService<Collaborator, CollaboratorR
     }
 
     @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasAuthority('collaborator:picker')")
+    public List<CollaboratorResponseDto> findAdmitted() {
+        List<UUID> ids = admissionProcessRepository.findCollaboratorIdsFromCompletedAdmissions(
+                AdmissionStatusEnum.COMPLETED, StatusEnum.DELETED);
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+        return CollaboratorRepository.findAllById(ids).stream()
+                .filter(c -> c.getStatus() != StatusEnum.DELETED)
+                .sorted(Comparator.comparing(Collaborator::getFullName, String.CASE_INSENSITIVE_ORDER))
+                .map(CollaboratorMapper::toResponse)
+                .toList();
+    }
+
+    @Override
     @Transactional
     @PreAuthorize("hasAuthority('collaborator:write')")
     public CollaboratorResponseDto create(CollaboratorRequestDto request) {
-        CollaboratorRepository
-                .findByCpfAndStatusNot(request.getCpf(), StatusEnum.DELETED)
-                .ifPresent(p -> {
-                    throw CollaboratorException.cpfAlreadyExists();
-                });
-        return super.create(request);
+        throw CollaboratorException.directCreateNotAllowed();
     }
 
     @Override

@@ -1,24 +1,55 @@
 "use client";
 
 import { useQuery, type QueryKey, type UseQueryResult } from "@tanstack/react-query";
-import type { ReactNode } from "react";
-import { RefreshCw } from "lucide-react";
+import { useMemo, type ReactNode } from "react";
 import { ExceptionCapture } from "@/shared/exceptions";
 import { Button } from "@/shared/components/ui/Button";
+import { DataTable, type DataTableRowActivateOn } from "@/shared/components/ui/DataTable";
+import type { TableColumnConfig } from "@/shared/types/table.types";
+import { QueryRefreshProvider } from "@/shared/components/data/QueryRefreshContext";
 
-export type QueryPanelRenderProps<T> = {
-  data: T;
-  refetch: UseQueryResult<T>["refetch"];
+/** Props do render prop de {@link QueryPanel} (lista: `data` é sempre `TRow[]`). */
+export type QueryPanelRenderProps<TRow> = {
+  data: TRow[];
+  refetch: UseQueryResult<TRow[]>["refetch"];
   isFetching: boolean;
 };
 
-type QueryPanelProps<T> = {
+type QueryPanelProps<TRow extends object> = {
   queryKey: QueryKey;
-  request: () => Promise<T>;
-  children: (props: QueryPanelRenderProps<T>) => ReactNode;
+  request: () => Promise<TRow[]>;
+  children: (props: QueryPanelRenderProps<TRow>) => ReactNode;
   fallback?: ReactNode;
   errorFallback?: (error: Error, retry: () => void) => ReactNode;
   showRefresh?: boolean;
+};
+
+/** Props da tabela repassadas ao {@link DataTable} (sem `data` / `columns`). */
+export type QueryTablePanelTableProps<TRow extends object> = {
+  rowKey?: string;
+  emptyMessage?: string;
+  compact?: boolean;
+  striped?: boolean;
+  stickyHeader?: boolean;
+  onRowActivate?: (row: TRow) => void;
+  rowActivateOn?: DataTableRowActivateOn;
+  /** @deprecated Use `onRowActivate` + `rowActivateOn="click"` */
+  onRowClick?: (row: TRow) => void;
+  /** @deprecated Use `onRowActivate` + `rowActivateOn="doubleclick"` */
+  onRowDoubleClick?: (row: TRow) => void;
+  renderActions?: (row: TRow) => ReactNode;
+  actionsHeader?: string;
+  actionsClassName?: string;
+};
+
+/** QueryPanel + DataTable — `onRowActivate` e demais props de tabela vão aqui. */
+export type QueryTablePanelProps<TRow extends object> = QueryTablePanelTableProps<TRow> & {
+  queryKey: QueryKey;
+  request: () => Promise<TRow[]>;
+  columns: TableColumnConfig[];
+  showRefresh?: boolean;
+  fallback?: ReactNode;
+  errorFallback?: (error: Error, retry: () => void) => ReactNode;
 };
 
 function TableSkeleton() {
@@ -31,53 +62,86 @@ function TableSkeleton() {
   );
 }
 
-export function QueryPanel<T>({
+export function QueryPanel<TRow extends object>({
   queryKey,
   request,
   children,
   fallback,
   errorFallback,
-  showRefresh = true,
-}: QueryPanelProps<T>) {
+  showRefresh = false,
+}: QueryPanelProps<TRow>) {
   const query = useQuery({ queryKey, queryFn: request });
 
+  const refreshValue = useMemo(
+    () =>
+      !query.isLoading && !query.isError && query.data !== undefined
+        ? {
+            refetch: () => void query.refetch(),
+            isFetching: query.isFetching,
+          }
+        : null,
+    [query.data, query.isError, query.isFetching, query.isLoading, query.refetch],
+  );
+
   if (query.isLoading) {
-    return fallback ?? <TableSkeleton />;
+    return <QueryRefreshProvider value={null}>{fallback ?? <TableSkeleton />}</QueryRefreshProvider>;
   }
 
   if (query.isError) {
     const ex = ExceptionCapture.fromUnknown(query.error);
     const error = new Error(ex.displayMessage);
     return (
-      errorFallback?.(error, () => void query.refetch()) ?? (
-        <div className="m-5 rounded-xl bg-error/8 p-5">
-          <p className="text-sm font-semibold text-error">{ex.displayMessage}</p>
-          <Button variant="primary" size="sm" className="mt-3" onClick={() => query.refetch()}>
-            Tentar novamente
-          </Button>
-        </div>
-      )
+      <QueryRefreshProvider value={null}>
+        {errorFallback?.(error, () => void query.refetch()) ?? (
+          <div className="m-5 rounded-xl bg-error/8 p-5">
+            <p className="text-sm font-semibold text-error">{ex.displayMessage}</p>
+            <Button variant="primary" size="sm" className="mt-3" onClick={() => query.refetch()}>
+              Tentar novamente
+            </Button>
+          </div>
+        )}
+      </QueryRefreshProvider>
     );
   }
 
   if (query.data === undefined) return null;
 
   return (
-    <div>
-      {showRefresh && (
-        <div className="flex justify-end border-b border-base-300/50 px-4 py-2.5">
-          <Button
-            variant="ghost"
-            size="sm"
-            leftIcon={<RefreshCw className={`size-3.5 ${query.isFetching ? "animate-spin" : ""}`} />}
-            onClick={() => query.refetch()}
-            disabled={query.isFetching}
-          >
-            Atualizar
-          </Button>
-        </div>
+    <QueryRefreshProvider value={refreshValue}>
+      <div className="min-h-0 flex-1">
+        {children({ data: query.data, refetch: query.refetch, isFetching: query.isFetching })}
+      </div>
+    </QueryRefreshProvider>
+  );
+}
+
+export function QueryTablePanel<TRow extends object>(props: QueryTablePanelProps<TRow>) {
+  const {
+    queryKey,
+    request,
+    columns,
+    showRefresh,
+    fallback,
+    errorFallback,
+    rowActivateOn = "doubleclick",
+    ...tableProps
+  } = props;
+  return (
+    <QueryPanel<TRow>
+      queryKey={queryKey}
+      request={request}
+      showRefresh={showRefresh}
+      fallback={fallback}
+      errorFallback={errorFallback}
+    >
+      {({ data }) => (
+        <DataTable<TRow>
+          data={data}
+          columns={columns}
+          rowActivateOn={rowActivateOn}
+          {...tableProps}
+        />
       )}
-      {children({ data: query.data, refetch: query.refetch, isFetching: query.isFetching })}
-    </div>
+    </QueryPanel>
   );
 }

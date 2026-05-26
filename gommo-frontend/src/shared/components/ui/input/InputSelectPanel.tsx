@@ -30,7 +30,7 @@ export function InputSelectPanel({
     return (
         <div
             className={clsx(
-                "absolute z-50 mt-1 w-full overflow-hidden rounded-[10px] border border-digital-blue-200/80 bg-base-100 shadow-lg shadow-digital-blue-500/8",
+                "surface-popover absolute z-50 mt-1 w-full overflow-hidden",
                 className,
             )}
         >
@@ -49,10 +49,10 @@ export function InputSelectPanel({
                                 aria-disabled={item.disabled}
                                 id={`${listId}-opt-${index}`}
                                 className={clsx(
-                                    "flex cursor-pointer items-start gap-2 px-3 py-2 text-sm transition-colors",
+                                    "gommo-listbox-option",
                                     item.disabled && "pointer-events-none opacity-45",
-                                    active && "bg-digital-blue-50 text-digital-blue-700",
-                                    !active && "hover:bg-digital-blue-50/60",
+                                    active && "gommo-listbox-option--active",
+                                    selected && "gommo-listbox-option--selected",
                                 )}
                                 onMouseEnter={() => onHighlight(index)}
                                 onMouseDown={(e) => e.preventDefault()}
@@ -66,7 +66,12 @@ export function InputSelectPanel({
                     </span>
                     )}
                 </span>
-                                {selected && <Check className="mt-0.5 size-4 shrink-0 text-digital-blue-600" aria-hidden/>}
+                                {selected && (
+                                    <Check
+                                        className="mt-0.5 size-4 shrink-0 text-digital-blue-600 dark:text-primary"
+                                        aria-hidden
+                                    />
+                                )}
                             </li>
                         );
                     })}

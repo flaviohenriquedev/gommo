@@ -1,10 +1,10 @@
 "use client";
 
 import {AnimatePresence, motion} from "framer-motion";
-import Link from "next/link";
-import {usePathname} from "next/navigation";
 import clsx from "clsx";
 import type {AppRoute} from "@/config/routes";
+import {useWorkspaceNavigation} from "@/shared/workspace/useWorkspaceNavigation";
+import {useWorkspaceStore} from "@/shared/workspace/workspace.store";
 
 type SidebarFlyoutProps = {
     route: AppRoute;
@@ -13,7 +13,11 @@ type SidebarFlyoutProps = {
 };
 
 export function SidebarFlyout({route, anchorTop, onClose}: SidebarFlyoutProps) {
-    const pathname = usePathname();
+    const {openRouteModule} = useWorkspaceNavigation();
+    const activeWorkspaceTab = useWorkspaceStore((s) =>
+        s.tabs.find((t) => t.id === s.activeTabId),
+    );
+    const navActiveHref = activeWorkspaceTab?.href;
 
     return (
         <AnimatePresence>
@@ -29,21 +33,35 @@ export function SidebarFlyout({route, anchorTop, onClose}: SidebarFlyoutProps) {
                 <p className="px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em] text-base-content/40">
                     {route.label}
                 </p>
-                <ul className="space-y-1">
-                    {route.children?.map((child) => (
-                        <li key={child.id}>
-                            <Link
-                                href={child.href ?? "#"}
-                                onClick={onClose}
-                                className={clsx(
-                                    "nav-item nav-item-child",
-                                    pathname === child.href && "nav-item-active",
-                                )}
-                            >
-                                {child.label}
-                            </Link>
-                        </li>
-                    ))}
+                <ul className="nav-group-children space-y-0.5">
+                    {route.children?.map((child) => {
+                        const ChildIcon = child.icon;
+                        const active = child.href === navActiveHref;
+                        return (
+                            <li key={child.id}>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        if (child.href) openRouteModule(child);
+                                        onClose();
+                                    }}
+                                    className={clsx(
+                                        "nav-item nav-item-child w-full",
+                                        active && "nav-item-active",
+                                    )}
+                                >
+                                    <ChildIcon
+                                        className={clsx(
+                                            "size-4.25 shrink-0",
+                                            active ? "text-digital-blue-600" : "text-base-content/38",
+                                        )}
+                                        strokeWidth={active ? 2.25 : 2}
+                                    />
+                                    <span className="sidebar-copy truncate">{child.label}</span>
+                                </button>
+                            </li>
+                        );
+                    })}
                 </ul>
             </motion.div>
         </AnimatePresence>

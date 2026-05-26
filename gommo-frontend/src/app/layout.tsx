@@ -20,6 +20,10 @@ const jakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "Gommo — Departamento Pessoal",
   description: "Sistema de gestão de RH e departamento pessoal",
+  icons: {
+    icon: "/brand/gommo-logo-icon.png",
+    apple: "/brand/gommo-logo-icon.png",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

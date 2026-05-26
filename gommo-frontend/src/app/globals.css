@@ -100,6 +100,7 @@
 :root {
     --sidebar-width: 16.25rem;
     --sidebar-collapsed: 4.5rem;
+    --workspace-content-padding: 0.75rem;
     --header-height: 4rem;
     --sidebar-transition-duration: 500ms;
 
@@ -108,6 +109,7 @@
     --gommo-control-px: 14px;
     --gommo-control-radius: 8px;
     --gommo-control-font-size: 14px;
+    --gommo-autofill-bg: var(--color-base-100);
 
     /* Sidebar */
     --sidebar-bg: var(--color-base-100);
@@ -120,6 +122,7 @@
 
 [data-theme="dark"] {
     --color-page: oklch(12% 0.018 260);
+    --gommo-autofill-bg: color-mix(in srgb, var(--color-base-100) 88%, var(--color-digital-blue-500) 12%);
     --sidebar-accent: color-mix(in srgb, var(--color-primary) 18%, transparent);
     --sidebar-border: color-mix(in srgb, oklch(38% 0.02 260) 70%, transparent);
     --sidebar-bg: var(--color-base-100);
@@ -186,8 +189,7 @@ body {
 }
 
 /* Card base — white panel with layered shadow */
-.surface-card,
-.surface-page-header {
+.surface-card {
     border-radius: var(--radius-gommo-card-lg);
     border: 1px solid color-mix(in srgb, var(--color-digital-blue-200) 60%, white);
     background: var(--color-base-100);
@@ -199,11 +201,24 @@ body {
     transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-[data-theme="dark"] .surface-card, .surface-page-header {
+[data-theme="dark"] .surface-card {
     border-color: color-mix(in srgb, var(--color-base-content) 10%, transparent);
     background: var(--color-base-100);
     box-shadow: 0 1px 1px color-mix(in srgb, black 22%, transparent),
     0 12px 32px color-mix(in srgb, black 26%, transparent);
+}
+
+/* Breadcrumb — sombra leve (sem exagero do card) */
+.page-breadcrumb {
+    border-radius: var(--radius-gommo-card-lg);
+    border: 1px solid color-mix(in srgb, var(--color-digital-blue-200) 45%, white);
+    background: var(--color-base-100);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--color-digital-blue-900) 4%, transparent);
+}
+
+[data-theme="dark"] .page-breadcrumb {
+    border-color: color-mix(in srgb, var(--color-base-content) 10%, transparent);
+    box-shadow: none;
 }
 
 /* Interactive card — lifts on hover */
@@ -215,18 +230,23 @@ body {
     0 24px 56px color-mix(in srgb, var(--color-digital-blue-500) 8%, transparent);
 }
 
-/* Glassmorphism header bar */
+/* Top header — fundo sólido */
 .surface-header {
-    background: color-mix(in srgb, var(--color-base-100) 86%, transparent);
+    background: var(--color-base-100);
     border-bottom: 1px solid color-mix(in srgb, var(--color-digital-blue-200) 55%, transparent);
-    backdrop-filter: blur(18px) saturate(1.6);
-    -webkit-backdrop-filter: blur(18px) saturate(1.6);
 }
 
 [data-theme="dark"] .surface-header {
-    background: color-mix(in srgb, var(--color-base-100) 88%, transparent);
+    background: var(--color-base-100);
     border-bottom-color: color-mix(in srgb, var(--color-base-content) 9%, transparent);
 }
+
+/* Logo alternância claro / escuro */
+.sidebar-logo-light { display: block; }
+.sidebar-logo-dark  { display: none;  }
+
+[data-theme="dark"] .sidebar-logo-light { display: none;  }
+[data-theme="dark"] .sidebar-logo-dark  { display: block; }
 
 /* Popover / dropdown surface */
 .surface-popover {
@@ -256,6 +276,7 @@ body {
     height: var(--gommo-control-h);
     min-height: var(--gommo-control-h);
     padding: 0 var(--gommo-control-px);
+    overflow: hidden;
     border-radius: var(--gommo-control-radius);
     border: 1px solid color-mix(in srgb, var(--color-base-content) 13%, transparent);
     background: var(--color-base-100);
@@ -297,13 +318,15 @@ body {
     cursor: not-allowed;
 }
 
-/* Inner native input */
+/* Inner native input — estica no flex (altura/largura úteis para autofill) */
 .gommo-field input,
 .gommo-field textarea,
 .gommo-control input,
 .gommo-control textarea {
+    flex: 1 1 auto;
+    align-self: stretch;
     width: 100%;
-    height: 100%;
+    min-width: 0;
     min-height: 0;
     padding: 0;
     border: none;
@@ -314,12 +337,56 @@ body {
     line-height: normal;
     outline: none;
     box-shadow: none;
+    border-radius: 0;
 }
 
 .gommo-field input::placeholder,
 .gommo-control input::placeholder {
     color: color-mix(in srgb, var(--color-base-content) 36%, transparent);
     font-variation-settings: "wght" 400;
+}
+
+/* Select / placeholder de valor vazio (Selecione, Não informado…) */
+.gommo-field--placeholder,
+.gommo-select-trigger--placeholder {
+    color: color-mix(in srgb, var(--color-base-content) 42%, transparent) !important;
+    font-variation-settings: "wght" 450;
+}
+
+[data-theme="dark"] .gommo-field--placeholder,
+[data-theme="dark"] .gommo-select-trigger--placeholder {
+    color: color-mix(in srgb, var(--color-base-content) 48%, transparent) !important;
+}
+
+/* Autofill — fundo no campo inteiro + texto legível (light/dark) */
+.gommo-field:has(input:-webkit-autofill),
+.gommo-field:has(input:-webkit-autofill:hover),
+.gommo-field:has(input:-webkit-autofill:focus),
+.gommo-control:has(input:-webkit-autofill) {
+    background: var(--gommo-autofill-bg);
+}
+
+.gommo-field input:-webkit-autofill,
+.gommo-field input:-webkit-autofill:hover,
+.gommo-field input:-webkit-autofill:focus,
+.gommo-field input:-webkit-autofill:active,
+.gommo-control input:-webkit-autofill,
+.gommo-control input:-webkit-autofill:hover,
+.gommo-control input:-webkit-autofill:focus,
+.gommo-control input:-webkit-autofill:active {
+    -webkit-text-fill-color: var(--color-base-content) !important;
+    caret-color: var(--color-base-content);
+    -webkit-box-shadow: 0 0 0 1000px var(--gommo-autofill-bg) inset !important;
+    box-shadow: 0 0 0 1000px var(--gommo-autofill-bg) inset !important;
+    transition: background-color 99999s ease-out 0s;
+}
+
+.gommo-field input:-moz-autofill,
+.gommo-field input:-moz-autofill-preview,
+.gommo-control input:-moz-autofill {
+    background-color: var(--gommo-autofill-bg) !important;
+    color: var(--color-base-content) !important;
+    box-shadow: none;
 }
 
 /* ──────────────────────────────────────────────
@@ -483,6 +550,24 @@ body {
     transform: translateY(1px);
 }
 
+/* ─── Success (atualizar) ─── */
+.gommo-btn--success {
+    background: var(--color-success);
+    color: var(--color-success-content);
+    border-color: transparent;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 1px 2px color-mix(in srgb, var(--color-success) 28%, transparent);
+}
+
+.gommo-btn--success:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--color-success) 88%, black);
+    border-color: transparent;
+}
+
+.gommo-btn--success:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
 /* ─── Size: small ─── */
 .gommo-btn--sm {
     height: 36px;
@@ -563,11 +648,18 @@ body {
     align-items: center;
     gap: 0.75rem;
     padding: 0.5rem 0.875rem;
+    border: 0;
+    margin: 0;
+    appearance: none;
+    background: transparent;
     border-radius: 8px;
+    font: inherit;
     font-size: 0.875rem;
     font-variation-settings: "wght" 500;
     line-height: 1.25;
+    text-align: left;
     color: color-mix(in srgb, var(--color-base-content) 58%, transparent);
+    cursor: pointer;
     transition: background 0.13s ease,
     color 0.13s ease;
 }
@@ -591,39 +683,139 @@ aside[data-collapsed="true"] .sidebar-copy,
     transform: translateX(-4px);
 }
 
-/* Botão de recolher — centralizado na borda direita do sidebar */
-.sidebar-toggle-btn {
-    position: absolute;
-    top: calc(var(--header-height) + 1.875rem);
-    right: 0;
-    z-index: 10;
+.sidebar-toolbar {
+    gap: 0.75rem;
+}
+
+/* Toggle na borda direita do sidebar — acompanha --sidebar-current */
+.sidebar-edge-toggle {
+    position: fixed;
+    z-index: 45;
+    top: calc(var(--header-height) + 0.5rem);
+    left: var(--sidebar-current, var(--sidebar-width));
     display: flex;
-    width: 1.75rem;
-    height: 1.75rem;
-    min-width: 1.75rem;
-    min-height: 1.75rem;
-    flex-shrink: 0;
+    width: 1.375rem;
+    height: 1.375rem;
     align-items: center;
     justify-content: center;
     padding: 0;
     border-radius: 9999px;
     border: 1px solid var(--sidebar-border);
     background: var(--color-base-100);
-    color: color-mix(in srgb, var(--color-base-content) 45%, transparent);
-    box-shadow: 0 1px 2px color-mix(in srgb, var(--color-digital-blue-900) 6%, transparent),
-    0 4px 10px color-mix(in srgb, var(--color-digital-blue-500) 8%, transparent);
+    color: color-mix(in srgb, var(--color-base-content) 50%, transparent);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--color-digital-blue-900) 8%, transparent);
     cursor: pointer;
-    transition: background 0.2s ease,
-    color 0.2s ease,
-    box-shadow 0.2s ease;
-    transform: translate(50%, -50%);
+    transform: translateX(-50%);
+    transition:
+        left var(--sidebar-transition-duration) cubic-bezier(0.22, 1, 0.36, 1),
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
-.sidebar-toggle-btn:hover {
+.sidebar-edge-toggle:hover {
+    border-color: color-mix(in srgb, var(--color-digital-blue-300) 70%, transparent);
     background: var(--color-digital-blue-50);
     color: var(--color-digital-blue-600);
-    box-shadow: 0 2px 4px color-mix(in srgb, var(--color-digital-blue-900) 8%, transparent),
-    0 6px 16px color-mix(in srgb, var(--color-digital-blue-500) 12%, transparent);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--color-digital-blue-500) 14%, transparent);
+}
+
+/* Itens de listbox (select / autocomplete) — mesmo hover do menu do usuário */
+.gommo-listbox-option {
+    display: flex;
+    width: 100%;
+    cursor: pointer;
+    align-items: flex-start;
+    gap: 0.625rem;
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    font-size: 0.8125rem;
+    line-height: 1.25;
+    font-variation-settings: "wght" 500;
+    color: color-mix(in srgb, var(--color-base-content) 58%, transparent);
+    transition: background 0.13s ease, color 0.13s ease;
+}
+
+.gommo-listbox-option:hover {
+    background: color-mix(in srgb, var(--color-digital-blue-500) 7%, transparent);
+    color: var(--color-base-content);
+}
+
+.gommo-listbox-option--active {
+    background: var(--color-digital-blue-50);
+    color: var(--color-digital-blue-700);
+    font-variation-settings: "wght" 620;
+}
+
+.gommo-listbox-option--selected {
+    color: var(--color-digital-blue-700);
+}
+
+[data-theme="dark"] .gommo-listbox-option:hover {
+    background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+    color: var(--color-base-content);
+}
+
+[data-theme="dark"] .gommo-listbox-option--active,
+[data-theme="dark"] .gommo-listbox-option--selected {
+    background: color-mix(in srgb, var(--color-primary) 18%, transparent);
+    color: var(--color-primary);
+}
+
+/* CRUD list toolbar */
+.crud-list-toolbar {
+    border-color: color-mix(in srgb, var(--color-digital-blue-100) 50%, transparent);
+    background: color-mix(in srgb, var(--color-digital-blue-50) 35%, var(--color-base-100));
+}
+
+[data-theme="dark"] .crud-list-toolbar {
+    border-color: color-mix(in srgb, var(--color-base-content) 10%, transparent);
+    background: color-mix(in srgb, var(--color-primary) 8%, var(--color-base-100));
+}
+
+.crud-tablist {
+    border-color: color-mix(in srgb, var(--color-digital-blue-100) 70%, transparent);
+}
+
+[data-theme="dark"] .crud-tablist {
+    border-color: color-mix(in srgb, var(--color-base-content) 10%, transparent);
+}
+
+/* Sidebar nav — sem scrollbar visível + fade inferior */
+.sidebar-nav-wrap {
+    position: relative;
+    display: flex;
+    min-height: 0;
+    flex: 1;
+    flex-direction: column;
+}
+
+.sidebar-nav-wrap::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    height: 2.75rem;
+    pointer-events: none;
+    background: linear-gradient(to top, var(--sidebar-bg) 15%, transparent);
+}
+
+.sidebar-nav {
+    flex: 1;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-bottom: 2.75rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
 }
 
 .sidebar-search-flyout {
@@ -661,8 +853,18 @@ aside[data-collapsed="true"] .sidebar-copy,
     color: var(--color-digital-blue-700);
 }
 
+.nav-group-children {
+    margin: 0.125rem 0 0.25rem 0.625rem;
+    padding: 0.125rem 0 0.125rem 0.625rem;
+    border-left: 1px solid color-mix(in srgb, var(--color-digital-blue-200) 65%, transparent);
+}
+
+[data-theme="dark"] .nav-group-children {
+    border-left-color: color-mix(in srgb, var(--color-base-content) 14%, transparent);
+}
+
 .nav-item-child {
-    padding-left: 2.5rem;
+    padding-left: 0.875rem;
     font-size: 0.8125rem;
 }
 
@@ -822,4 +1024,160 @@ kbd {
 
 .animate-slide-down {
     animation: slide-down 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ──────────────────────────────────────────────
+   Workspace (abas internas estilo navegador)
+────────────────────────────────────────────── */
+html.gommo-workspace-active,
+html.gommo-workspace-active body {
+    overflow: hidden;
+    height: 100%;
+}
+
+.login-hero-logo {
+    filter: brightness(0) invert(1);
+}
+
+/* Conteúdo abaixo da trilha de abas — afastado só da sidebar */
+.workspace-content {
+    padding-inline: var(--workspace-content-padding);
+}
+
+.workspace-tabbar,
+.workspace-tabbar-empty {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-digital-blue-50) 65%, var(--color-base-100)) 0%,
+        color-mix(in srgb, var(--color-page) 55%, var(--color-base-100)) 100%
+    );
+    border-bottom: 1px solid color-mix(in srgb, var(--color-digital-blue-200) 40%, transparent);
+}
+
+[data-theme="dark"] .workspace-tabbar,
+[data-theme="dark"] .workspace-tabbar-empty {
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-base-200) 90%, var(--color-base-100)) 0%,
+        color-mix(in srgb, var(--color-base-100) 95%, transparent) 100%
+    );
+    border-bottom-color: color-mix(in srgb, var(--color-base-content) 10%, transparent);
+}
+
+.workspace-tabbar-actions {
+    border-left: 1px solid color-mix(in srgb, var(--color-digital-blue-200) 35%, transparent);
+}
+
+[data-theme="dark"] .workspace-tabbar-actions {
+    border-left-color: color-mix(in srgb, var(--color-base-content) 8%, transparent);
+}
+
+.workspace-tabbar-menu-trigger {
+    height: 2.25rem;
+    margin-inline: 0.25rem;
+    border-radius: 8px;
+    color: color-mix(in srgb, var(--color-base-content) 55%, transparent);
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.workspace-tabbar-menu-trigger:hover {
+    background: color-mix(in srgb, var(--color-base-100) 70%, transparent);
+    color: var(--color-base-content);
+}
+
+/* Espaço para o toggle na borda do sidebar não cobrir a primeira aba */
+@media (min-width: 1024px) {
+    .gommo-workspace-active .workspace-tabbar-scroll,
+    .gommo-workspace-active .workspace-tabbar-empty {
+        padding-inline-start: 1.35rem;
+    }
+}
+
+.workspace-tabbar-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-base-content) 18%, transparent) transparent;
+}
+
+.workspace-tabbar-scroll::-webkit-scrollbar {
+    height: 4px;
+}
+
+.workspace-tabbar-scroll::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-base-content) 22%, transparent);
+}
+
+.workspace-tabs-lift.tabs {
+    flex-wrap: nowrap;
+    align-items: flex-end;
+    gap: 0.125rem;
+    height: auto;
+    min-height: 2.75rem;
+}
+
+.workspace-tabs-lift .workspace-tab.tab {
+    position: relative;
+    height: 2.25rem;
+    min-height: 2.25rem;
+    flex-shrink: 0;
+    color: color-mix(in srgb, var(--color-base-content) 62%, transparent);
+}
+
+.workspace-tabs-lift .workspace-tab.tab:not(.tab-active):hover {
+    color: color-mix(in srgb, var(--color-base-content) 88%, transparent);
+}
+
+.workspace-tabs-lift .workspace-tab.tab-active {
+    color: var(--color-base-content);
+    font-variation-settings: "wght" 620;
+}
+
+.workspace-tab-close {
+    color: color-mix(in srgb, var(--color-base-content) 42%, transparent);
+    opacity: 0;
+    transition: opacity 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+
+.workspace-tab:hover .workspace-tab-close,
+.workspace-tab.tab-active .workspace-tab-close {
+    opacity: 1;
+}
+
+.workspace-tab-close:hover {
+    background: color-mix(in srgb, var(--color-base-content) 8%, transparent);
+    color: var(--color-base-content);
+}
+
+/* Cursor em elementos clicáveis */
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+a[href],
+select:not(:disabled),
+summary,
+.nav-item,
+.workspace-tab,
+.workspace-tab-close,
+.workspace-tabbar-menu-trigger,
+.sidebar-edge-toggle,
+.gommo-btn:not(:disabled),
+.gommo-listbox-option,
+.crud-tablist [role="tab"],
+label.gommo-field:has(input:not(:disabled)),
+label.gommo-field:has(textarea:not(:disabled)) {
+    cursor: pointer;
+}
+
+button:disabled,
+.gommo-btn:disabled,
+[aria-disabled="true"] {
+    cursor: not-allowed;
+}
+
+/* ── System alert modal (acima de pickers e workspace) ── */
+.system-alert-modal {
+    z-index: 300;
+}
+
+.system-alert-modal::backdrop {
+    background: rgb(10 22 40 / 0.45);
 }

@@ -1,0 +1,7 @@
+package br.com.gommo.modules.benefit.dto;
+import jakarta.validation.constraints.NotBlank; import jakarta.validation.constraints.Size; import java.math.BigDecimal; import lombok.*;
+@Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+public class BenefitPlanRequestDto {
+    @NotBlank @Size(max = 120) private String name; @NotBlank @Size(max = 60) private String benefitType;
+    private BigDecimal monthlyValue; private String description;
+}

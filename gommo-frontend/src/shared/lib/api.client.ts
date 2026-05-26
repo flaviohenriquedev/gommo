@@ -1,10 +1,10 @@
-import { AppException } from "@/shared/exceptions/app.exception";
-import type { ErrorResponseDto } from "@/shared/exceptions/error-response.dto";
-import { AUTH_CLIENT_MESSAGES } from "@/modules/root/exceptions/auth.messages";
+import {AppException} from "@/shared/exceptions/app.exception";
+import type {ErrorResponseDto} from "@/shared/exceptions/error-response.dto";
+import {AUTH_CLIENT_MESSAGES} from "@/modules/root/exceptions/auth.messages";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8081";
 
-export { AppException, ApiError } from "@/shared/exceptions/app.exception";
+export {AppException, ApiError} from "@/shared/exceptions/app.exception";
 
 type RequestOptions = {
     method?: string;
@@ -25,7 +25,7 @@ async function resolveAuthToken(explicit?: string | null): Promise<string | null
     if (explicit) return explicit;
     if (authToken) return authToken;
     if (typeof window === "undefined") return null;
-    const { getSession } = await import("next-auth/react");
+    const {getSession} = await import("next-auth/react");
     const session = await getSession();
     const token = session?.accessToken ?? null;
     if (token) setAuthToken(token);
@@ -36,11 +36,11 @@ async function refreshSessionTokens(): Promise<string | null> {
     authToken = null;
     if (typeof window === "undefined") return null;
 
-    const { getSession, signOut } = await import("next-auth/react");
+    const {getSession, signOut} = await import("next-auth/react");
     const session = await getSession();
 
     if (session?.error === "RefreshAccessTokenError" || session?.error === "RefreshTokenMissing") {
-        await signOut({ callbackUrl: "/login" });
+        await signOut({callbackUrl: "/login"});
         return null;
     }
 
@@ -50,9 +50,9 @@ async function refreshSessionTokens(): Promise<string | null> {
 }
 
 export async function apiFetch<T>(path: string, options: RequestOptions = {}): Promise<T> {
-    const { method = "GET", body, token, headers = {}, _retry = false } = options;
+    const {method = "GET", body, token, headers = {}, _retry = false} = options;
     const correlationId = crypto.randomUUID();
-    let bearer = await resolveAuthToken(token);
+    const bearer = await resolveAuthToken(token);
 
     const doFetch = (authHeader: string | null) =>
         fetch(`${API_BASE_URL}${path}`, {
@@ -60,7 +60,7 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
             headers: {
                 "Content-Type": "application/json",
                 "X-Correlation-ID": correlationId,
-                ...(authHeader ? { Authorization: `Bearer ${authHeader}` } : {}),
+                ...(authHeader ? {Authorization: `Bearer ${authHeader}`} : {}),
                 ...headers,
             },
             body: body !== undefined ? JSON.stringify(body) : undefined,
@@ -89,7 +89,7 @@ export async function apiFetch<T>(path: string, options: RequestOptions = {}): P
                 return parseResponse<T>(response);
             }
         }
-        return handleErrorResponse(response, { ...options, _retry: true });
+        return handleErrorResponse(response, {...options, _retry: true});
     }
 
     if (!response.ok) {

@@ -65,7 +65,7 @@ export function InputDatetime({
           className={clsx(
             "gommo-field w-full cursor-pointer text-left",
             fieldClass(disabled, readOnly, Boolean(error)),
-            !display && "text-base-content/45",
+            !display && "gommo-select-trigger--placeholder",
             className,
           )}
           onClick={() => !disabled && !readOnly && setOpen((v) => !v)}

@@ -96,6 +96,16 @@ const BADGE_LABELS: Record<string, string> = {
   ACTIVE: "Ativo",
   INACTIVE: "Inativo",
   DELETED: "Excluído",
+  DRAFT: "Rascunho",
+  IN_PROGRESS: "Em andamento",
+  COMPLETED: "Concluída",
+  CANCELLED: "Cancelada",
+  VACATION: "Férias",
+  MEDICAL: "Afastamento médico",
+  MATERNITY: "Maternidade",
+  PATERNITY: "Paternidade",
+  UNPAID: "Não remunerado",
+  OTHER: "Outro",
 };
 
 function formatBadgeLabel(value: unknown): string {
@@ -108,5 +118,9 @@ export function badgeClassForStatus(value: unknown): string {
   if (normalized === "ACTIVE") return "badge-success";
   if (normalized === "INACTIVE") return "badge-warning";
   if (normalized === "DELETED") return "badge-error";
+  if (normalized === "DRAFT") return "bg-base-300/60 text-base-content/65";
+  if (normalized === "IN_PROGRESS") return "badge-info";
+  if (normalized === "COMPLETED") return "badge-success";
+  if (normalized === "CANCELLED") return "badge-error";
   return "bg-base-300/60 text-base-content/65";
 }
