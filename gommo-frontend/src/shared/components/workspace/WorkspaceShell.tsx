@@ -86,7 +86,7 @@ export function WorkspaceShell() {
 
             <div className="workspace-content relative min-h-0 flex-1 overflow-hidden">
                 {showDashboard && (
-                    <div className="absolute inset-0 flex min-h-0 flex-col overflow-hidden">
+                    <div className="workspace-panel absolute inset-0">
                         <DashboardView/>
                     </div>
                 )}
@@ -101,7 +101,7 @@ export function WorkspaceShell() {
                         <div
                             key={tab.id}
                             className={clsx(
-                                "absolute inset-0 flex min-h-0 flex-col overflow-hidden pt-1 pl-1",
+                                "workspace-panel absolute inset-0",
                                 !active && "pointer-events-none invisible",
                             )}
                             aria-hidden={!active}

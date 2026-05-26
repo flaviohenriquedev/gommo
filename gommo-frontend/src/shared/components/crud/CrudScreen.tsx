@@ -1,7 +1,6 @@
 "use client";
 
 import clsx from "clsx";
-import { motion } from "framer-motion";
 import { Plus, RefreshCw } from "lucide-react";
 import {
   createContext,
@@ -54,6 +53,10 @@ export type CrudScreenProps = {
   listTabLabel?: string;
   formTabLabel?: string;
   formTabLabelEdit?: string;
+  /** Cadastro direto bloqueado no backend — entrada via admissão. */
+  editOnly?: boolean;
+  /** Botão principal da listagem (ex.: Nova Admissão) no lugar de “Novo cadastro”. */
+  listPrimaryAction?: ReactNode;
   listToolbar?: ReactNode;
   showListToFormButton?: boolean;
   listToFormLabel?: string;
@@ -72,6 +75,8 @@ export function CrudScreen({
   formTabLabelEdit = "Editar",
   listToolbar,
   showListToFormButton = true,
+  editOnly = false,
+  listPrimaryAction,
   listToFormLabel = "Novo cadastro",
   defaultTab = CRUD_TAB_LIST,
   initialEditingId = null,
@@ -109,17 +114,18 @@ export function CrudScreen({
     ],
   );
 
-  const tabs = useMemo(
-    () => [
-      { id: CRUD_TAB_LIST, label: listTabLabel },
-      {
+  const tabs = useMemo(() => {
+    const items: { id: string; label: string }[] = [{ id: CRUD_TAB_LIST, label: listTabLabel }];
+    const showFormTab = !editOnly || isEditing || activeTab === CRUD_TAB_FORM;
+    if (showFormTab) {
+      items.push({
         id: CRUD_TAB_FORM,
         label: isEditing && activeTab === CRUD_TAB_FORM ? formTabLabelEdit : formTabLabel,
-      },
-      ...extraTabs.map((t) => ({ id: t.id, label: t.label })),
-    ],
-    [activeTab, extraTabs, formTabLabel, formTabLabelEdit, isEditing, listTabLabel],
-  );
+      });
+    }
+    items.push(...extraTabs.map((t) => ({ id: t.id, label: t.label })));
+    return items;
+  }, [activeTab, editOnly, extraTabs, formTabLabel, formTabLabelEdit, isEditing, listTabLabel]);
 
   const goToList = useCallback(() => {
     setEditingId(null);
@@ -130,10 +136,11 @@ export function CrudScreen({
   const goToForm = useCallback(() => setActiveTab(CRUD_TAB_FORM), []);
 
   const startCreate = useCallback(() => {
+    if (editOnly) return;
     setEditingId(null);
     setActiveTab(CRUD_TAB_FORM);
     syncWorkspace({ isNew: true });
-  }, [syncWorkspace]);
+  }, [editOnly, syncWorkspace]);
 
   const startEdit = useCallback(
     (id: string, record?: object) => {
@@ -172,7 +179,7 @@ export function CrudScreen({
       <div className="flex min-h-0 flex-1 flex-col">
 
         <div
-          className="crud-tablist flex items-center gap-0.5 overflow-x-auto overflow-y-hidden border-b px-4 pt-0.5"
+          className="gommo-crud-tablist"
           role="tablist"
           aria-label="Seções do cadastro"
         >
@@ -189,25 +196,14 @@ export function CrudScreen({
                 onClick={() => {
                   if (tab.id === CRUD_TAB_LIST) goToList();
                   else if (tab.id === CRUD_TAB_FORM) {
+                    if (editOnly && !editingId) return;
                     setActiveTab(CRUD_TAB_FORM);
-                    if (workspaceEnabled && !editingId) syncWorkspace({ isNew: true });
+                    if (workspaceEnabled && !editingId && !editOnly) syncWorkspace({ isNew: true });
                   } else setActiveTab(tab.id);
                 }}
-                className={clsx(
-                  "relative shrink-0 cursor-pointer rounded-t-[6px] px-3 py-2 text-[13px] transition-colors duration-150",
-                  selected
-                    ? "font-semibold text-digital-blue-600 dark:text-primary"
-                    : "font-medium text-base-content/45 hover:text-base-content/75",
-                )}
+                className={clsx("gommo-crud-tab", selected && "gommo-crud-tab--active")}
               >
                 {tab.label}
-                {selected && (
-                  <motion.span
-                    layoutId="crud-tab-indicator"
-                    className="absolute inset-x-1.5 -bottom-px h-[2px] rounded-full bg-digital-blue-500"
-                    transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                  />
-                )}
               </button>
             );
           })}
@@ -241,7 +237,7 @@ export function CrudScreen({
                     }
                   />
                 )}
-                {showListToFormButton && (
+                {showListToFormButton ? (
                   <Button
                     size="sm"
                     leftIcon={<Plus className="size-3.5" strokeWidth={2.5} />}
@@ -249,12 +245,23 @@ export function CrudScreen({
                   >
                     {listToFormLabel}
                   </Button>
+                ) : (
+                  listPrimaryAction
                 )}
               </div>
             </div>
           )}
 
-          <div className="min-h-0 flex-1 overflow-y-auto">{panel}</div>
+          <div
+            className={clsx(
+              "min-h-0 flex-1",
+              activeTab === CRUD_TAB_LIST
+                ? "overflow-y-auto"
+                : "flex flex-col overflow-hidden",
+            )}
+          >
+            {panel}
+          </div>
         </div>
       </div>
     </CrudScreenContext.Provider>

@@ -6,6 +6,7 @@ import {
     MessageSquare,
     UserMinus,
     UserPlus,
+    UserRound,
     Users,
 } from "lucide-react";
 
@@ -16,6 +17,13 @@ export const collaboratorRoutes: AppRoute[] = [
         icon: Users,
         permission: "admission:read",
         children: [
+            {
+                id: "collaborator-people",
+                label: "Pessoas",
+                href: "/collaborator/people",
+                icon: UserRound,
+                permission: "collaborator:read",
+            },
             { id: "collaborator-admission", label: "Admissão", href: "/collaborator/admission", icon: UserPlus, permission: "admission:read" },
             { id: "collaborator-history", label: "Histórico", href: "/collaborator/history", icon: ClipboardList, permission: "admission:read" },
         ],

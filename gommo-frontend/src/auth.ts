@@ -11,6 +11,8 @@ class TokenResponse {
   refreshToken!: string;
   tokenType!: string;
   expiresInSeconds!: number;
+  username?: string;
+  email?: string;
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -35,7 +37,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           setAuthToken(data.accessToken);
           return {
             id: credentials.username as string,
-            name: credentials.username as string,
+            name: data.username ?? (credentials.username as string),
+            email: data.email,
             accessToken: data.accessToken,
             refreshToken: data.refreshToken,
             accessTokenExpires: Date.now() + data.expiresInSeconds * 1000,
@@ -61,6 +64,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return {
           ...token,
           sub: user.id,
+          name: user.name,
+          email: user.email,
           accessToken: user.accessToken,
           refreshToken: user.refreshToken,
           accessTokenExpires: user.accessTokenExpires,
@@ -78,6 +83,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       session.accessToken = token.accessToken as string | undefined;
       session.refreshToken = token.refreshToken as string | undefined;
       session.error = token.error as typeof session.error;
+
+      if (session.user) {
+        session.user.name = (token.name as string | undefined) ?? session.user.name;
+        session.user.email = (token.email as string | undefined) ?? session.user.email;
+      }
 
       if (token.error) {
         session.accessToken = undefined;

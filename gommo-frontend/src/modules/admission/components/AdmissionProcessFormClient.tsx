@@ -13,10 +13,12 @@ import {
 import { admissionprocessKeys } from "@/modules/admission/admission.query";
 import { admissionprocessService } from "@/modules/admission/services/admission-process.service";
 import { useCrudScreen } from "@/shared/components/crud/CrudScreen";
+import { CrudFormShell } from "@/shared/components/crud/CrudFormShell";
 import { useSyncWorkspaceTabTitle } from "@/shared/workspace/useSyncWorkspaceTabTitle";
 import { EntityAttachments } from "@/shared/components/storage/EntityAttachments";
 import { ExceptionCapture } from "@/shared/exceptions";
 import { Button } from "@/shared/components/ui/Button";
+import { FormSection } from "@/shared/components/ui/FormSection";
 import {
     InputCEP,
     InputCPF,
@@ -58,14 +60,6 @@ const CONTRACT_TYPE_ITEMS: SelectItem[] = [
     { value: "APPRENTICE", label: "Aprendiz" },
     { value: "INTERN", label: "Estágio" },
 ];
-
-function SectionTitle({ children }: { children: string }) {
-    return (
-        <p className="text-xs font-semibold uppercase tracking-wide text-base-content/45 sm:col-span-2">
-            {children}
-        </p>
-    );
-}
 
 export function AdmissionProcessFormClient() {
     const { editingId, isEditing, goToList, startCreate } = useCrudScreen();
@@ -116,7 +110,7 @@ export function AdmissionProcessFormClient() {
         setForm((prev) => ({ ...prev, [field]: value }));
     };
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError(null);
         saveMutation.mutate(form);
@@ -148,8 +142,26 @@ export function AdmissionProcessFormClient() {
     const linkedCollaboratorId = detailQuery.data?.collaboratorId;
 
     return (
-        <div className="flex flex-col gap-4 p-4">
-            <form onSubmit={handleSubmit} className="grid gap-3 sm:grid-cols-2">
+        <CrudFormShell
+            onSubmit={handleSubmit}
+            footer={
+                <>
+                    <Button type="button" variant="ghost" onClick={goToList}>
+                        Cancelar
+                    </Button>
+                    {isEditing && (
+                        <Button type="button" variant="outline" onClick={startCreate}>
+                            Nova admissão
+                        </Button>
+                    )}
+                    <Button type="submit" loading={saveMutation.isPending}>
+                        {isEditing ? "Salvar" : "Cadastrar admissão"}
+                    </Button>
+                </>
+            }
+        >
+            <div className="flex flex-col gap-4 p-4">
+                <div className="grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
                     <p className="text-sm font-semibold text-base-content">
                         {isEditing ? "Editar admissão" : "Nova admissão"}
@@ -159,199 +171,193 @@ export function AdmissionProcessFormClient() {
                         admissão.
                     </p>
                     {linkedCollaboratorId && (
-                        <p className="mt-1 text-xs text-digital-blue-600 dark:text-primary">
+                        <p className="mt-1 text-xs text-primary">
                             Colaborador vinculado: {linkedCollaboratorId.slice(0, 8)}…
                         </p>
                     )}
                 </div>
 
-                <SectionTitle>Processo</SectionTitle>
-                <InputSelect
-                    label="Status do processo"
-                    items={ADMISSION_STATUS_ITEMS}
-                    value={form.admissionStatus ?? "DRAFT"}
-                    onValueChange={(v) =>
-                        update("admissionStatus", (v || "DRAFT") as AdmissionProcessCreateDto["admissionStatus"])
-                    }
-                    required
-                />
-                <InputDate
-                    label="Data de abertura"
-                    value={form.startedAt ?? ""}
-                    onValueChange={(v) => update("startedAt", v)}
-                />
-                <InputString
-                    label="Observações internas"
-                    value={form.notes ?? ""}
-                    onValueChange={(v) => update("notes", v)}
-                    wrapperClassName="sm:col-span-2"
-                />
+                <FormSection title="Processo" description="Status e datas do fluxo de admissão.">
+                    <InputSelect
+                        label="Status do processo"
+                        items={ADMISSION_STATUS_ITEMS}
+                        value={form.admissionStatus ?? "DRAFT"}
+                        onValueChange={(v) =>
+                            update("admissionStatus", (v || "DRAFT") as AdmissionProcessCreateDto["admissionStatus"])
+                        }
+                        required
+                    />
+                    <InputDate
+                        label="Data de abertura"
+                        value={form.startedAt ?? ""}
+                        onValueChange={(v) => update("startedAt", v)}
+                    />
+                    <InputString
+                        label="Observações internas"
+                        value={form.notes ?? ""}
+                        onValueChange={(v) => update("notes", v)}
+                        wrapperClassName="sm:col-span-2"
+                    />
+                </FormSection>
 
-                <SectionTitle>Dados básicos</SectionTitle>
-                <InputString
-                    label="Nome completo"
-                    value={form.fullName}
-                    onValueChange={(v) => update("fullName", v)}
-                    required
-                    wrapperClassName="sm:col-span-2"
-                />
-                <InputString
-                    label="Nome social"
-                    value={form.socialName ?? ""}
-                    onValueChange={(v) => update("socialName", v)}
-                />
-                <InputCPF
-                    label="CPF"
-                    value={form.cpf}
-                    onValueChange={(v) => update("cpf", v)}
-                    required
-                    hint="Salvo apenas com dígitos"
-                />
-                <InputRG label="RG" value={form.rg ?? ""} onValueChange={(v) => update("rg", v)} />
-                <InputDate
-                    label="Data de nascimento"
-                    value={form.birthDate}
-                    onValueChange={(v) => update("birthDate", v)}
-                    required
-                />
-                <InputSelect
-                    label="Gênero"
-                    items={GENDER_ITEMS}
-                    value={form.gender ?? ""}
-                    onValueChange={(v) => update("gender", (v || undefined) as AdmissionProcessCreateDto["gender"])}
-                    placeholder="Não informado"
-                    clearable
-                />
-                <InputSelect
-                    label="Estado civil"
-                    items={MARITAL_ITEMS}
-                    value={form.maritalStatus ?? ""}
-                    onValueChange={(v) =>
-                        update("maritalStatus", (v || undefined) as AdmissionProcessCreateDto["maritalStatus"])
-                    }
-                    placeholder="Não informado"
-                    clearable
-                />
-                <InputString
-                    label="Nacionalidade"
-                    value={form.nationality ?? ""}
-                    onValueChange={(v) => update("nationality", v)}
-                />
-                <InputString label="PIS/PASEP" value={form.pisPasep ?? ""} onValueChange={(v) => update("pisPasep", v)} />
-                <InputString
-                    label="Nome da mãe"
-                    value={form.motherName ?? ""}
-                    onValueChange={(v) => update("motherName", v)}
-                    wrapperClassName="sm:col-span-2"
-                />
-                <InputString
-                    label="Nome do pai"
-                    value={form.fatherName ?? ""}
-                    onValueChange={(v) => update("fatherName", v)}
-                    wrapperClassName="sm:col-span-2"
-                />
+                <FormSection title="Dados básicos" description="Identificação pessoal do futuro colaborador.">
+                    <InputString
+                        label="Nome completo"
+                        value={form.fullName}
+                        onValueChange={(v) => update("fullName", v)}
+                        required
+                        wrapperClassName="sm:col-span-2"
+                    />
+                    <InputString
+                        label="Nome social"
+                        value={form.socialName ?? ""}
+                        onValueChange={(v) => update("socialName", v)}
+                    />
+                    <InputCPF
+                        label="CPF"
+                        value={form.cpf}
+                        onValueChange={(v) => update("cpf", v)}
+                        required
+                        hint="Salvo apenas com dígitos"
+                    />
+                    <InputRG label="RG" value={form.rg ?? ""} onValueChange={(v) => update("rg", v)} />
+                    <InputDate
+                        label="Data de nascimento"
+                        value={form.birthDate}
+                        onValueChange={(v) => update("birthDate", v)}
+                        required
+                    />
+                    <InputSelect
+                        label="Gênero"
+                        items={GENDER_ITEMS}
+                        value={form.gender ?? ""}
+                        onValueChange={(v) => update("gender", (v || undefined) as AdmissionProcessCreateDto["gender"])}
+                        placeholder="Não informado"
+                        clearable
+                    />
+                    <InputSelect
+                        label="Estado civil"
+                        items={MARITAL_ITEMS}
+                        value={form.maritalStatus ?? ""}
+                        onValueChange={(v) =>
+                            update("maritalStatus", (v || undefined) as AdmissionProcessCreateDto["maritalStatus"])
+                        }
+                        placeholder="Não informado"
+                        clearable
+                    />
+                    <InputString
+                        label="Nacionalidade"
+                        value={form.nationality ?? ""}
+                        onValueChange={(v) => update("nationality", v)}
+                    />
+                    <InputString label="PIS/PASEP" value={form.pisPasep ?? ""} onValueChange={(v) => update("pisPasep", v)} />
+                    <InputString
+                        label="Nome da mãe"
+                        value={form.motherName ?? ""}
+                        onValueChange={(v) => update("motherName", v)}
+                        wrapperClassName="sm:col-span-2"
+                    />
+                    <InputString
+                        label="Nome do pai"
+                        value={form.fatherName ?? ""}
+                        onValueChange={(v) => update("fatherName", v)}
+                        wrapperClassName="sm:col-span-2"
+                    />
+                </FormSection>
 
-                <SectionTitle>Dados de endereço</SectionTitle>
-                <InputCEP label="CEP" value={form.zipCode ?? ""} onValueChange={(v) => update("zipCode", v)} />
-                <InputString
-                    label="UF"
-                    value={form.stateCode ?? ""}
-                    onValueChange={(v) => update("stateCode", v)}
-                    maxLength={2}
-                />
-                <InputString
-                    label="Logradouro"
-                    value={form.street ?? ""}
-                    onValueChange={(v) => update("street", v)}
-                    wrapperClassName="sm:col-span-2"
-                />
-                <InputString label="Número" value={form.number ?? ""} onValueChange={(v) => update("number", v)} />
-                <InputString
-                    label="Complemento"
-                    value={form.complement ?? ""}
-                    onValueChange={(v) => update("complement", v)}
-                />
-                <InputString label="Bairro" value={form.district ?? ""} onValueChange={(v) => update("district", v)} />
-                <InputString label="Cidade" value={form.city ?? ""} onValueChange={(v) => update("city", v)} />
+                <FormSection title="Endereço" description="Residência principal informada na admissão.">
+                    <InputCEP label="CEP" value={form.zipCode ?? ""} onValueChange={(v) => update("zipCode", v)} />
+                    <InputString
+                        label="UF"
+                        value={form.stateCode ?? ""}
+                        onValueChange={(v) => update("stateCode", v)}
+                        maxLength={2}
+                    />
+                    <InputString
+                        label="Logradouro"
+                        value={form.street ?? ""}
+                        onValueChange={(v) => update("street", v)}
+                        wrapperClassName="sm:col-span-2"
+                    />
+                    <InputString label="Número" value={form.number ?? ""} onValueChange={(v) => update("number", v)} />
+                    <InputString
+                        label="Complemento"
+                        value={form.complement ?? ""}
+                        onValueChange={(v) => update("complement", v)}
+                    />
+                    <InputString label="Bairro" value={form.district ?? ""} onValueChange={(v) => update("district", v)} />
+                    <InputString label="Cidade" value={form.city ?? ""} onValueChange={(v) => update("city", v)} />
+                </FormSection>
 
-                <SectionTitle>Dados de contato</SectionTitle>
-                <InputString label="E-mail" value={form.email ?? ""} onValueChange={(v) => update("email", v)} />
-                <InputString
-                    label="Telefone / WhatsApp"
-                    value={form.phone ?? ""}
-                    onValueChange={(v) => update("phone", v)}
-                />
+                <FormSection title="Contato" description="Canais de comunicação do colaborador.">
+                    <InputString label="E-mail" value={form.email ?? ""} onValueChange={(v) => update("email", v)} />
+                    <InputString
+                        label="Telefone / WhatsApp"
+                        value={form.phone ?? ""}
+                        onValueChange={(v) => update("phone", v)}
+                    />
+                </FormSection>
 
-                <SectionTitle>Vínculo previsto</SectionTitle>
-                <InputDate
-                    label="Previsão de início"
-                    value={form.expectedStartDate}
-                    onValueChange={(v) => update("expectedStartDate", v)}
-                    required
-                />
-                <InputSelect
-                    label="Tipo de contrato"
-                    items={CONTRACT_TYPE_ITEMS}
-                    value={form.contractType ?? "CLT"}
-                    onValueChange={(v) =>
-                        update("contractType", (v || "CLT") as AdmissionProcessCreateDto["contractType"])
-                    }
-                    required
-                />
-                <InputCurrency
-                    label="Salário base"
-                    value={form.baseSalary != null ? String(form.baseSalary) : ""}
-                    onValueChange={(v) => update("baseSalary", v)}
-                    emitAsDecimal
-                />
-                <InputDecimal
-                    label="Carga horária semanal"
-                    value={form.workloadHours != null ? String(form.workloadHours) : ""}
-                    onValueChange={(v) => update("workloadHours", v)}
-                />
-                <InputString
-                    label="ID empresa (opcional)"
-                    value={form.companyId ?? ""}
-                    onValueChange={(v) => update("companyId", v)}
-                    hint="UUID da empresa"
-                />
-                <InputString
-                    label="ID departamento (opcional)"
-                    value={form.departmentId ?? ""}
-                    onValueChange={(v) => update("departmentId", v)}
-                    hint="UUID do departamento"
-                />
-                <InputString
-                    label="ID cargo (opcional)"
-                    value={form.jobPositionId ?? ""}
-                    onValueChange={(v) => update("jobPositionId", v)}
-                    hint="UUID do cargo"
-                    wrapperClassName="sm:col-span-2"
-                />
+                <FormSection title="Vínculo previsto" description="Contrato e alocação organizacional.">
+                    <InputDate
+                        label="Previsão de início"
+                        value={form.expectedStartDate}
+                        onValueChange={(v) => update("expectedStartDate", v)}
+                        required
+                    />
+                    <InputSelect
+                        label="Tipo de contrato"
+                        items={CONTRACT_TYPE_ITEMS}
+                        value={form.contractType ?? "CLT"}
+                        onValueChange={(v) =>
+                            update("contractType", (v || "CLT") as AdmissionProcessCreateDto["contractType"])
+                        }
+                        required
+                    />
+                    <InputCurrency
+                        label="Salário base"
+                        value={form.baseSalary != null ? String(form.baseSalary) : ""}
+                        onValueChange={(v) => update("baseSalary", v)}
+                        emitAsDecimal
+                    />
+                    <InputDecimal
+                        label="Carga horária semanal"
+                        value={form.workloadHours != null ? String(form.workloadHours) : ""}
+                        onValueChange={(v) => update("workloadHours", v)}
+                    />
+                    <InputString
+                        label="ID empresa (opcional)"
+                        value={form.companyId ?? ""}
+                        onValueChange={(v) => update("companyId", v)}
+                        hint="UUID da empresa"
+                    />
+                    <InputString
+                        label="ID departamento (opcional)"
+                        value={form.departmentId ?? ""}
+                        onValueChange={(v) => update("departmentId", v)}
+                        hint="UUID do departamento"
+                    />
+                    <InputString
+                        label="ID cargo (opcional)"
+                        value={form.jobPositionId ?? ""}
+                        onValueChange={(v) => update("jobPositionId", v)}
+                        hint="UUID do cargo"
+                        wrapperClassName="sm:col-span-2"
+                    />
+                </FormSection>
 
                 {error && <p className="text-sm font-medium text-error sm:col-span-2">{error}</p>}
-                <div className="flex flex-wrap gap-2 sm:col-span-2">
-                    <Button type="submit" loading={saveMutation.isPending}>
-                        {isEditing ? "Salvar" : "Cadastrar admissão"}
-                    </Button>
-                    <Button type="button" variant="ghost" onClick={goToList}>
-                        Cancelar
-                    </Button>
-                    {isEditing && (
-                        <Button type="button" variant="outline" onClick={startCreate}>
-                            Nova admissão
-                        </Button>
-                    )}
                 </div>
-            </form>
 
-            <div className="rounded-lg border border-base-300/60 p-4">
-                <p className="mb-1 text-sm font-semibold text-base-content">Documentos</p>
-                <p className="mb-3 text-xs text-base-content/45">
-                    Anexos vinculados ao processo de admissão (armazenamento local).
-                </p>
-                <EntityAttachments entityType="admission_process" entityId={editingId} />
+                <FormSection
+                title="Documentos"
+                description="Anexos vinculados ao processo de admissão (armazenamento local)."
+            >
+                <div className="sm:col-span-2">
+                    <EntityAttachments entityType="admission_process" entityId={editingId} />
+                </div>
+            </FormSection>
             </div>
-        </div>
+        </CrudFormShell>
     );
 }

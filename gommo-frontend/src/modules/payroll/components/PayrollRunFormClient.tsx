@@ -9,6 +9,7 @@ import { emptyPayrollRunForm, payrollrunToFormDto } from "@/modules/payroll/lib/
 import { payrollrunKeys } from "@/modules/payroll/payroll.query";
 import { payrollrunService } from "@/modules/payroll/services/payroll-run.service";
 import { useCrudScreen } from "@/shared/components/crud/CrudScreen";
+import { CrudFormShell } from "@/shared/components/crud/CrudFormShell";
 import { ExceptionCapture } from "@/shared/exceptions";
 import { Button } from "@/shared/components/ui/Button";
 import { InputString, InputSelect, InputDecimal } from "@/shared/components/ui/input/index";
@@ -59,7 +60,7 @@ export function PayrollRunFormClient() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     saveMutation.mutate(form);
@@ -79,7 +80,17 @@ export function PayrollRunFormClient() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-3 p-4 sm:grid-cols-2">
+    <CrudFormShell
+      onSubmit={handleSubmit}
+      footer={
+        <>
+          <Button type="button" variant="ghost" onClick={goToList}>Cancelar</Button>
+          {isEditing && <Button type="button" variant="outline" onClick={startCreate}>Novo</Button>}
+          <Button type="submit" loading={saveMutation.isPending}>{isEditing ? "Salvar" : "Cadastrar"}</Button>
+        </>
+      }
+    >
+    <div className="grid gap-3 p-4 sm:grid-cols-2">
       <div className="sm:col-span-2">
         <p className="text-sm font-semibold text-base-content">{isEditing ? "Editar folha" : "Novo(a) folha"}</p>
       </div>
@@ -97,11 +108,7 @@ export function PayrollRunFormClient() {
         clearable
       />
       {error && <p className="text-sm font-medium text-error sm:col-span-2">{error}</p>}
-      <div className="flex flex-wrap gap-2 sm:col-span-2">
-        <Button type="submit" loading={saveMutation.isPending}>{isEditing ? "Salvar" : "Cadastrar"}</Button>
-        <Button type="button" variant="ghost" onClick={goToList}>Cancelar</Button>
-        {isEditing && <Button type="button" variant="outline" onClick={startCreate}>Novo</Button>}
-      </div>
-    </form>
+    </div>
+    </CrudFormShell>
   );
 }

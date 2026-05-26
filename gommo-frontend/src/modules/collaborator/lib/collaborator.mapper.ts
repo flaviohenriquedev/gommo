@@ -2,6 +2,14 @@ import type {Collaborator, CollaboratorCreateDto} from "@/modules/collaborator/d
 import {digitsOnly} from "@/shared/lib/input/digits";
 import {unmaskRg} from "@/shared/lib/input/rg";
 
+export function collaboratorFormToPayload(dto: CollaboratorCreateDto): CollaboratorCreateDto {
+    return {
+        ...dto,
+        cpf: digitsOnly(dto.cpf),
+        rg: dto.rg ? unmaskRg(dto.rg) : dto.rg,
+    };
+}
+
 export function collaboratorToFormDto(collaborator: Collaborator): CollaboratorCreateDto {
     return {
         fullName: collaborator.fullName,

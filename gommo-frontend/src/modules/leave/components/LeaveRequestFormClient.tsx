@@ -11,6 +11,7 @@ import { leaverequestKeys } from "@/modules/leave/leave.query";
 import { leaveRequestFormSchema } from "@/modules/leave/schemas/leave-request.schema";
 import { leaverequestService } from "@/modules/leave/services/leave-request.service";
 import { useCrudScreen } from "@/shared/components/crud/CrudScreen";
+import { CrudFormShell } from "@/shared/components/crud/CrudFormShell";
 import { Button } from "@/shared/components/ui/Button";
 import { InputAutocomplete, InputDate, InputSelect } from "@/shared/components/ui/input/index";
 import type { SelectItem } from "@/shared/components/ui/input/select-item.types";
@@ -118,7 +119,7 @@ export function LeaveRequestFormClient() {
     });
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
 
@@ -157,7 +158,25 @@ export function LeaveRequestFormClient() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-3 p-4 sm:grid-cols-2">
+    <CrudFormShell
+      onSubmit={handleSubmit}
+      footer={
+        <>
+          <Button type="button" variant="ghost" onClick={goToList}>
+            Cancelar
+          </Button>
+          {isEditing && (
+            <Button type="button" variant="outline" onClick={startCreate}>
+              Novo
+            </Button>
+          )}
+          <Button type="submit" loading={saveMutation.isPending}>
+            {isEditing ? "Salvar" : "Cadastrar"}
+          </Button>
+        </>
+      }
+    >
+    <div className="grid gap-3 p-4 sm:grid-cols-2">
       <div className="sm:col-span-2">
         <p className="text-sm font-semibold text-base-content">
           {isEditing ? "Editar afastamento" : "Novo afastamento"}
@@ -217,20 +236,7 @@ export function LeaveRequestFormClient() {
       />
 
       {error && <p className="text-sm font-medium text-error sm:col-span-2">{error}</p>}
-
-      <div className="flex flex-wrap gap-2 sm:col-span-2">
-        <Button type="submit" loading={saveMutation.isPending}>
-          {isEditing ? "Salvar" : "Cadastrar"}
-        </Button>
-        <Button type="button" variant="ghost" onClick={goToList}>
-          Cancelar
-        </Button>
-        {isEditing && (
-          <Button type="button" variant="outline" onClick={startCreate}>
-            Novo
-          </Button>
-        )}
-      </div>
-    </form>
+    </div>
+    </CrudFormShell>
   );
 }

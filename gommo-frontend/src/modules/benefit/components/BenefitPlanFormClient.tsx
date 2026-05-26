@@ -9,6 +9,7 @@ import { emptyBenefitPlanForm, benefitplanToFormDto } from "@/modules/benefit/li
 import { benefitplanKeys } from "@/modules/benefit/benefit.query";
 import { benefitplanService } from "@/modules/benefit/services/benefit-plan.service";
 import { useCrudScreen } from "@/shared/components/crud/CrudScreen";
+import { CrudFormShell } from "@/shared/components/crud/CrudFormShell";
 import { ExceptionCapture } from "@/shared/exceptions";
 import { Button } from "@/shared/components/ui/Button";
 import { InputString, InputCurrency } from "@/shared/components/ui/input/index";
@@ -63,7 +64,7 @@ export function BenefitPlanFormClient() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     saveMutation.mutate(form);
@@ -83,7 +84,17 @@ export function BenefitPlanFormClient() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-3 p-4 sm:grid-cols-2">
+    <CrudFormShell
+      onSubmit={handleSubmit}
+      footer={
+        <>
+          <Button type="button" variant="ghost" onClick={goToList}>Cancelar</Button>
+          {isEditing && <Button type="button" variant="outline" onClick={startCreate}>Novo</Button>}
+          <Button type="submit" loading={saveMutation.isPending}>{isEditing ? "Salvar" : "Cadastrar"}</Button>
+        </>
+      }
+    >
+    <div className="grid gap-3 p-4 sm:grid-cols-2">
       <div className="sm:col-span-2">
         <p className="text-sm font-semibold text-base-content">{isEditing ? "Editar benefício" : "Novo(a) benefício"}</p>
       </div>
@@ -91,11 +102,7 @@ export function BenefitPlanFormClient() {
       <InputString label="Benefit Type" value={form.benefitType ?? ""} onValueChange={(v) => update("benefitType", v)} required />
       <InputCurrency label="Valor mensal" value={form.monthlyValue ?? ""} onValueChange={(v) => update("monthlyValue", v)} emitAsDecimal />
       {error && <p className="text-sm font-medium text-error sm:col-span-2">{error}</p>}
-      <div className="flex flex-wrap gap-2 sm:col-span-2">
-        <Button type="submit" loading={saveMutation.isPending}>{isEditing ? "Salvar" : "Cadastrar"}</Button>
-        <Button type="button" variant="ghost" onClick={goToList}>Cancelar</Button>
-        {isEditing && <Button type="button" variant="outline" onClick={startCreate}>Novo</Button>}
-      </div>
-    </form>
+    </div>
+    </CrudFormShell>
   );
 }

@@ -62,7 +62,7 @@ export function WorkspaceTabOverflowMenu({
                                     <div
                                         className={clsx(
                                             "flex items-center gap-0.5 pe-1 transition-colors",
-                                            active && "bg-digital-blue-50/80 dark:bg-primary/10",
+                                            active && "bg-primary/8",
                                         )}
                                     >
                                         <button

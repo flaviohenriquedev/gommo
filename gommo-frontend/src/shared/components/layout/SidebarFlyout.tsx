@@ -53,7 +53,7 @@ export function SidebarFlyout({route, anchorTop, onClose}: SidebarFlyoutProps) {
                                     <ChildIcon
                                         className={clsx(
                                             "size-4.25 shrink-0",
-                                            active ? "text-digital-blue-600" : "text-base-content/38",
+                                            active ? "text-primary" : "text-base-content/38",
                                         )}
                                         strokeWidth={active ? 2.25 : 2}
                                     />

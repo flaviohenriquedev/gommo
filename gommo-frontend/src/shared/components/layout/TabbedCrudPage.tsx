@@ -23,12 +23,20 @@ export type TabbedCrudPageProps<TEntity extends object> = Omit<
     routeLabel: string;
     tabShortLabel: string;
     fieldTabName?: keyof TEntity & string;
+    /** Apenas listagem e edição — sem cadastro novo na aba de formulário. */
+    editOnly?: boolean;
 };
 
-function crudInitialState(entityKey: WorkspaceEntityKey): {
+function crudInitialState(
+    entityKey: WorkspaceEntityKey,
+    editOnly?: boolean,
+): {
     defaultTab: string;
     initialEditingId: string | null;
 } {
+    if (editOnly && (isModuleListTab(entityKey) || entityKey === "new")) {
+        return {defaultTab: CRUD_TAB_LIST, initialEditingId: null};
+    }
     if (isModuleListTab(entityKey)) {
         return {defaultTab: CRUD_TAB_LIST, initialEditingId: null};
     }
@@ -46,12 +54,13 @@ export function TabbedCrudPage<TEntity extends object>({
     fieldTabName,
     list,
     form,
+    editOnly,
     ...crudProps
 }: TabbedCrudPageProps<TEntity>) {
     const {tab} = useWorkspaceTab();
     const {defaultTab, initialEditingId} = useMemo(
-        () => crudInitialState(tab.entityKey),
-        [tab.entityKey],
+        () => crudInitialState(tab.entityKey, editOnly),
+        [editOnly, tab.entityKey],
     );
 
     const config: TabbedCrudConfig = {
@@ -72,6 +81,7 @@ export function TabbedCrudPage<TEntity extends object>({
                         defaultTab={defaultTab}
                         initialEditingId={initialEditingId}
                         workspaceEnabled
+                        editOnly={editOnly}
                         {...crudProps}
                     />
                 </CrudPageCard>

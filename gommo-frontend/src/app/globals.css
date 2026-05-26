@@ -4,30 +4,98 @@
 
 /* ================================================================
    GOMMO DESIGN SYSTEM — globals.css
-   Palette: Digital Blue · Base: #edf2fb · Font: Inter Variable
-   Controls: h-46px · px-21px · radius-10px (mirrors .btn--m ref)
+   Font: Inter · Tokens centralizados em :root (troque só aqui)
 ================================================================ */
+
+/* ──────────────────────────────────────────────
+   TOKENS — fonte única de cores, bordas e sombras
+────────────────────────────────────────────── */
+:root {
+    /* Brand — cor principal */
+    --gommo-primary: #6d28d9;
+    --gommo-primary-dark: #5b21b6;
+    --gommo-primary-darker: #4c1d95;
+    --gommo-primary-light: #8b5cf6;
+    --gommo-primary-50: #f5f3ff;
+    --gommo-primary-100: #ede9fe;
+    --gommo-primary-200: #ddd6fe;
+    --gommo-primary-300: #c4b5fd;
+    --gommo-primary-400: #a78bfa;
+    --gommo-primary-500: #8b5cf6;
+    --gommo-primary-600: #7c3aed;
+    --gommo-primary-700: #6d28d9;
+    --gommo-primary-800: #5b21b6;
+    --gommo-primary-900: #4c1d95;
+    --gommo-primary-950: #2e1065;
+
+    /* Semânticas — manter por enquanto */
+    --gommo-success: #16a34a;
+    --gommo-success-content: #ffffff;
+    --gommo-warning: #d97706;
+    --gommo-warning-content: #ffffff;
+    --gommo-error: #dc2626;
+    --gommo-error-content: #ffffff;
+    --gommo-info: #3385ff;
+    --gommo-info-content: #ffffff;
+
+    /* Superfícies light (estrutura atual) */
+    --gommo-page: #f6f8fb;
+    --gommo-header-border: #e5e7eb;
+    --gommo-surface: #ffffff;
+    --gommo-surface-muted: #edf2fb;
+    --gommo-surface-accent: var(--gommo-primary-50);
+    --gommo-content: #0a1628;
+
+    /* Bordas — neutras suaves (accent só no focus) */
+    --gommo-border: #e4e7ec;
+    --gommo-border-subtle: #eef1f5;
+    --gommo-border-strong: #d1d5db;
+    --gommo-border-focus: var(--gommo-primary);
+
+    /* Sombras super suaves */
+    --gommo-shadow-xs: 0 1px 2px color-mix(in srgb, #0a1628 4%, transparent);
+    --gommo-shadow-sm: 0 1px 3px color-mix(in srgb, #0a1628 5%, transparent),
+        0 1px 2px color-mix(in srgb, #0a1628 3%, transparent);
+    --gommo-shadow-md: 0 2px 8px color-mix(in srgb, #0a1628 6%, transparent),
+        0 1px 3px color-mix(in srgb, #0a1628 4%, transparent);
+    --gommo-shadow-lg: 0 4px 16px color-mix(in srgb, #0a1628 7%, transparent),
+        0 2px 6px color-mix(in srgb, #0a1628 4%, transparent);
+}
+
+[data-theme="dark"] {
+    --gommo-surface: oklch(19% 0.014 260);
+    --gommo-surface-muted: oklch(15% 0.014 260);
+    --gommo-content: oklch(95% 0.008 260);
+    --gommo-border: color-mix(in srgb, var(--color-base-content) 11%, transparent);
+    --gommo-border-subtle: color-mix(in srgb, var(--color-base-content) 6%, transparent);
+    --gommo-border-strong: color-mix(in srgb, var(--color-base-content) 16%, transparent);
+    --gommo-shadow-xs: 0 1px 2px color-mix(in srgb, black 18%, transparent);
+    --gommo-shadow-sm: 0 1px 3px color-mix(in srgb, black 22%, transparent);
+    --gommo-shadow-md: 0 4px 12px color-mix(in srgb, black 28%, transparent);
+    --gommo-shadow-lg: 0 8px 24px color-mix(in srgb, black 32%, transparent);
+}
 
 @theme inline {
     --font-sans: var(--font-inter), var(--font-jakarta), system-ui, sans-serif;
 
-    /* ── Digital Blue ── */
-    --color-digital-blue-50: #e5f0ff;
-    --color-digital-blue-100: #cce0ff;
-    --color-digital-blue-200: #99c2ff;
-    --color-digital-blue-300: #66a3ff;
-    --color-digital-blue-400: #3385ff;
-    --color-digital-blue-500: #0066ff;
-    --color-digital-blue-600: #0052cc;
-    --color-digital-blue-700: #003d99;
-    --color-digital-blue-800: #002966;
-    --color-digital-blue-900: #001433;
-    --color-digital-blue-950: #000e24;
+    /* Escala brand (alias legacy digital-blue → primary) */
+    --color-digital-blue-50: var(--gommo-primary-50);
+    --color-digital-blue-100: var(--gommo-primary-100);
+    --color-digital-blue-200: var(--gommo-primary-200);
+    --color-digital-blue-300: var(--gommo-primary-300);
+    --color-digital-blue-400: var(--gommo-primary-400);
+    --color-digital-blue-500: var(--gommo-primary-600);
+    --color-digital-blue-600: var(--gommo-primary-700);
+    --color-digital-blue-700: var(--gommo-primary-800);
+    --color-digital-blue-800: var(--gommo-primary-900);
+    --color-digital-blue-900: var(--gommo-primary-950);
+    --color-digital-blue-950: #1e0a45;
 
-    /* ── Page surface ── */
-    --color-page: #edf2fb;
+    --color-primary: var(--gommo-primary);
+    --color-primary-dark: var(--gommo-primary-dark);
 
-    /* ── Radius aliases ── */
+    --color-page: var(--gommo-page);
+
     --radius-gommo-control: 10px;
     --radius-gommo-card: 16px;
     --radius-gommo-card-lg: 10px;
@@ -42,31 +110,31 @@
     prefersdark: false;
     color-scheme: "light";
 
-    --color-base-100: #ffffff;
-    --color-base-200: #edf2fb;
-    --color-base-300: #cce0ff;
-    --color-base-content: #0a1628;
+    --color-base-100: var(--gommo-surface);
+    --color-base-200: var(--gommo-surface-muted);
+    --color-base-300: var(--gommo-primary-200);
+    --color-base-content: var(--gommo-content);
 
-    --color-primary: #0066ff;
+    --color-primary: var(--gommo-primary);
     --color-primary-content: #ffffff;
 
-    --color-secondary: #0052cc;
+    --color-secondary: var(--gommo-primary-dark);
     --color-secondary-content: #ffffff;
 
-    --color-accent: #e5f0ff;
-    --color-accent-content: #0052cc;
+    --color-accent: var(--gommo-primary-50);
+    --color-accent-content: var(--gommo-primary-dark);
 
     --color-neutral: #334155;
     --color-neutral-content: #f8fafc;
 
-    --color-info: #3385ff;
-    --color-info-content: #ffffff;
-    --color-success: #16a34a;
-    --color-success-content: #ffffff;
-    --color-warning: #d97706;
-    --color-warning-content: #ffffff;
-    --color-error: #dc2626;
-    --color-error-content: #ffffff;
+    --color-info: var(--gommo-info);
+    --color-info-content: var(--gommo-info-content);
+    --color-success: var(--gommo-success);
+    --color-success-content: var(--gommo-success-content);
+    --color-warning: var(--gommo-warning);
+    --color-warning-content: var(--gommo-warning-content);
+    --color-error: var(--gommo-error);
+    --color-error-content: var(--gommo-error-content);
 
     --radius-selector: 10px;
     --radius-field: 10px;
@@ -88,7 +156,7 @@
     --color-base-200: oklch(13% 0.015 260);
     --color-base-300: oklch(22% 0.02 260);
     --color-base-content: oklch(95% 0.008 260);
-    --color-primary: #3385ff;
+    --color-primary: var(--gommo-primary-light);
     --color-primary-content: #ffffff;
     --radius-field: 10px;
     --radius-box: 16px;
@@ -113,18 +181,18 @@
 
     /* Sidebar */
     --sidebar-bg: var(--color-base-100);
-    --sidebar-border: color-mix(in srgb, var(--color-digital-blue-200) 50%, transparent);
+    --sidebar-border: var(--gommo-border-subtle);
     --sidebar-fg: var(--color-base-content);
     --sidebar-muted: color-mix(in srgb, var(--color-base-content) 48%, transparent);
-    --sidebar-accent: var(--color-digital-blue-50);
-    --sidebar-active-fg: var(--color-digital-blue-600);
+    --sidebar-accent: var(--gommo-primary-50);
+    --sidebar-active-fg: var(--gommo-primary);
 }
 
 [data-theme="dark"] {
     --color-page: oklch(12% 0.018 260);
-    --gommo-autofill-bg: color-mix(in srgb, var(--color-base-100) 88%, var(--color-digital-blue-500) 12%);
-    --sidebar-accent: color-mix(in srgb, var(--color-primary) 18%, transparent);
-    --sidebar-border: color-mix(in srgb, oklch(38% 0.02 260) 70%, transparent);
+    --gommo-autofill-bg: color-mix(in srgb, var(--color-base-100) 88%, var(--gommo-primary) 12%);
+    --sidebar-accent: color-mix(in srgb, var(--gommo-primary) 18%, transparent);
+    --sidebar-border: var(--gommo-border-subtle);
     --sidebar-bg: var(--color-base-100);
 }
 
@@ -165,20 +233,25 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: color-mix(in srgb, var(--color-digital-blue-300) 40%, transparent);
+    background: color-mix(in srgb, var(--gommo-primary-300) 40%, transparent);
     border-radius: 99px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: color-mix(in srgb, var(--color-digital-blue-400) 65%, transparent);
+    background: color-mix(in srgb, var(--gommo-primary-400) 65%, transparent);
 }
 
 /* ──────────────────────────────────────────────
    Text selection
 ────────────────────────────────────────────── */
 ::selection {
-    background: var(--color-digital-blue-100);
-    color: var(--color-digital-blue-800);
+    background: var(--gommo-primary-100);
+    color: var(--gommo-primary-900);
+}
+
+[data-theme="dark"] ::selection {
+    background: color-mix(in srgb, var(--gommo-primary) 32%, transparent);
+    color: var(--color-base-content);
 }
 
 /* ──────────────────────────────────────────────
@@ -191,29 +264,26 @@ body {
 /* Card base — white panel with layered shadow */
 .surface-card {
     border-radius: var(--radius-gommo-card-lg);
-    border: 1px solid color-mix(in srgb, var(--color-digital-blue-200) 60%, white);
+    border: 1px solid var(--gommo-border);
     background: var(--color-base-100);
-    box-shadow: 0 1px 1px color-mix(in srgb, var(--color-digital-blue-900) 3%, transparent),
-    0 4px 10px color-mix(in srgb, var(--color-digital-blue-600) 5%, transparent),
-    0 16px 40px color-mix(in srgb, var(--color-digital-blue-500) 5%, transparent);
+    box-shadow: var(--gommo-shadow-sm);
     transition: box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1),
     border-color 0.22s ease,
     transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 [data-theme="dark"] .surface-card {
-    border-color: color-mix(in srgb, var(--color-base-content) 10%, transparent);
+    border-color: var(--gommo-border-subtle);
     background: var(--color-base-100);
-    box-shadow: 0 1px 1px color-mix(in srgb, black 22%, transparent),
-    0 12px 32px color-mix(in srgb, black 26%, transparent);
+    box-shadow: var(--gommo-shadow-sm);
 }
 
 /* Breadcrumb — sombra leve (sem exagero do card) */
 .page-breadcrumb {
     border-radius: var(--radius-gommo-card-lg);
-    border: 1px solid color-mix(in srgb, var(--color-digital-blue-200) 45%, white);
+    border: 1px solid var(--gommo-border);
     background: var(--color-base-100);
-    box-shadow: 0 1px 2px color-mix(in srgb, var(--color-digital-blue-900) 4%, transparent);
+    box-shadow: var(--gommo-shadow-xs);
 }
 
 [data-theme="dark"] .page-breadcrumb {
@@ -224,21 +294,19 @@ body {
 /* Interactive card — lifts on hover */
 .surface-card--hover:hover {
     transform: translateY(-2px);
-    border-color: color-mix(in srgb, var(--color-digital-blue-300) 55%, white);
-    box-shadow: 0 2px 4px color-mix(in srgb, var(--color-digital-blue-900) 5%, transparent),
-    0 8px 24px color-mix(in srgb, var(--color-digital-blue-600) 10%, transparent),
-    0 24px 56px color-mix(in srgb, var(--color-digital-blue-500) 8%, transparent);
+    border-color: var(--gommo-border-strong);
+    box-shadow: var(--gommo-shadow-md);
 }
 
 /* Top header — fundo sólido */
 .surface-header {
     background: var(--color-base-100);
-    border-bottom: 1px solid color-mix(in srgb, var(--color-digital-blue-200) 55%, transparent);
+    border-bottom: 1px solid var(--gommo-border);
 }
 
 [data-theme="dark"] .surface-header {
     background: var(--color-base-100);
-    border-bottom-color: color-mix(in srgb, var(--color-base-content) 9%, transparent);
+    border-bottom-color: var(--gommo-border-subtle);
 }
 
 /* Logo alternância claro / escuro */
@@ -248,19 +316,22 @@ body {
 [data-theme="dark"] .sidebar-logo-light { display: none;  }
 [data-theme="dark"] .sidebar-logo-dark  { display: block; }
 
+/* Hero login — wordmark claro sobre fundo brand (mesmo PNG do sidebar) */
+.gommo-logo-on-brand {
+    filter: brightness(0) invert(1);
+}
+
 /* Popover / dropdown surface */
 .surface-popover {
     border-radius: var(--radius-gommo-card);
-    border: 1px solid color-mix(in srgb, var(--color-digital-blue-200) 55%, transparent);
+    border: 1px solid var(--gommo-border);
     background: var(--color-base-100);
-    box-shadow: 0 2px 4px color-mix(in srgb, var(--color-digital-blue-900) 5%, transparent),
-    0 12px 28px color-mix(in srgb, var(--color-digital-blue-600) 9%, transparent),
-    0 32px 64px color-mix(in srgb, var(--color-digital-blue-500) 7%, transparent);
+    box-shadow: var(--gommo-shadow-md);
 }
 
 [data-theme="dark"] .surface-popover {
-    border-color: color-mix(in srgb, var(--color-base-content) 10%, transparent);
-    box-shadow: 0 18px 48px color-mix(in srgb, black 35%, transparent);
+    border-color: var(--gommo-border-subtle);
+    box-shadow: var(--gommo-shadow-lg);
 }
 
 /* ──────────────────────────────────────────────
@@ -278,7 +349,7 @@ body {
     padding: 0 var(--gommo-control-px);
     overflow: hidden;
     border-radius: var(--gommo-control-radius);
-    border: 1px solid color-mix(in srgb, var(--color-base-content) 13%, transparent);
+    border: 1px solid var(--gommo-border);
     background: var(--color-base-100);
     font-family: inherit;
     font-size: var(--gommo-control-font-size);
@@ -292,14 +363,14 @@ body {
 
 .gommo-field:hover,
 .gommo-control:hover:not(:disabled):not(.gommo-btn--primary):not(.gommo-btn--danger) {
-    border-color: color-mix(in srgb, var(--color-base-content) 22%, transparent);
+    border-color: var(--gommo-border-strong);
 }
 
 .gommo-field:focus-within,
 .gommo-control:focus-visible {
     outline: none;
-    border-color: var(--color-digital-blue-500);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-digital-blue-500) 18%, transparent);
+    border-color: var(--gommo-border-focus);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--gommo-primary) 14%, transparent);
 }
 
 /* Error state */
@@ -431,6 +502,22 @@ body {
    Width modifier:  block
    Shape modifier:  icon-only
 ────────────────────────────────────────────── */
+.gommo-spinner {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 9999px;
+    animation: gommo-spin 0.65s linear infinite;
+}
+
+@keyframes gommo-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .gommo-btn {
     display: inline-flex;
     width: auto;
@@ -466,41 +553,36 @@ body {
 
 /* ─── Primary ─── */
 .gommo-btn--primary {
-    background: var(--color-digital-blue-500);
+    background: var(--gommo-primary);
     color: #fff;
     border-color: transparent;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 1px 2px color-mix(in srgb, var(--color-digital-blue-900) 18%, transparent),
-    0 2px 8px color-mix(in srgb, var(--color-digital-blue-600) 22%, transparent);
+    box-shadow: var(--gommo-shadow-xs);
 }
 
 .gommo-btn--primary:hover:not(:disabled) {
-    background: var(--color-digital-blue-600);
+    background: var(--gommo-primary-dark);
     border-color: transparent;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 2px 6px color-mix(in srgb, var(--color-digital-blue-700) 28%, transparent),
-    0 6px 20px color-mix(in srgb, var(--color-digital-blue-600) 22%, transparent);
+    box-shadow: var(--gommo-shadow-sm);
 }
 
 .gommo-btn--primary:active:not(:disabled) {
-    background: var(--color-digital-blue-700);
+    background: var(--gommo-primary-darker);
     border-color: transparent;
     transform: translateY(1px) scale(0.995);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 1px 2px color-mix(in srgb, var(--color-digital-blue-900) 25%, transparent);
+    box-shadow: none;
 }
 
 .gommo-btn--primary:focus-visible {
-    box-shadow: 0 0 0 3.5px color-mix(in srgb, var(--color-digital-blue-500) 28%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--gommo-primary) 22%, transparent);
 }
 
 /* ─── Secondary / Outline ─── */
 .gommo-btn--secondary,
 .gommo-btn--outline {
-    background: color-mix(in srgb, var(--color-base-content) 4%, var(--color-base-100));
+    background: var(--color-base-100);
     color: var(--color-base-content);
-    box-shadow: 0 1px 2px color-mix(in srgb, var(--color-base-content) 4%, transparent);
+    border: 1px solid var(--gommo-border);
+    box-shadow: none;
 }
 
 .gommo-btn--secondary:hover:not(:disabled),
@@ -534,11 +616,10 @@ body {
 
 /* ─── Danger ─── */
 .gommo-btn--danger {
-    background: var(--color-error);
+    background: var(--gommo-error);
     color: #fff;
     border-color: transparent;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 1px 3px color-mix(in srgb, var(--color-error) 30%, transparent);
+    box-shadow: var(--gommo-shadow-xs);
 }
 
 .gommo-btn--danger:hover:not(:disabled) {
@@ -594,7 +675,7 @@ body {
 /* ─── Focus ring (global) ─── */
 .gommo-btn:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3.5px color-mix(in srgb, var(--color-digital-blue-500) 28%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--gommo-primary) 20%, transparent);
 }
 
 /* ─── Block ─── */
@@ -608,14 +689,15 @@ body {
 .gommo-date-picker-panel .react-day-picker,
 .gommo-datetime-picker-panel .react-day-picker {
     width: max-content;
-    --rdp-accent-color: var(--color-digital-blue-500);
-    --rdp-accent-background-color: var(--color-digital-blue-50);
+    --rdp-accent-color: var(--gommo-primary);
+    --rdp-accent-background-color: var(--gommo-primary-50);
 }
 
 .gommo-date-picker-panel,
 .gommo-datetime-picker-panel {
     border-radius: var(--radius-gommo-card);
-    border-color: color-mix(in srgb, var(--color-digital-blue-200) 75%, transparent);
+    border: 1px solid var(--gommo-border);
+    box-shadow: var(--gommo-shadow-md);
 }
 
 [data-theme="dark"] .gommo-date-picker-panel,
@@ -703,7 +785,7 @@ aside[data-collapsed="true"] .sidebar-copy,
     border: 1px solid var(--sidebar-border);
     background: var(--color-base-100);
     color: color-mix(in srgb, var(--color-base-content) 50%, transparent);
-    box-shadow: 0 1px 3px color-mix(in srgb, var(--color-digital-blue-900) 8%, transparent);
+    box-shadow: var(--gommo-shadow-xs);
     cursor: pointer;
     transform: translateX(-50%);
     transition:
@@ -715,10 +797,10 @@ aside[data-collapsed="true"] .sidebar-copy,
 }
 
 .sidebar-edge-toggle:hover {
-    border-color: color-mix(in srgb, var(--color-digital-blue-300) 70%, transparent);
-    background: var(--color-digital-blue-50);
-    color: var(--color-digital-blue-600);
-    box-shadow: 0 2px 8px color-mix(in srgb, var(--color-digital-blue-500) 14%, transparent);
+    border-color: color-mix(in srgb, var(--gommo-primary) 35%, transparent);
+    background: color-mix(in srgb, var(--gommo-primary) 8%, var(--color-base-100));
+    color: var(--gommo-primary);
+    box-shadow: var(--gommo-shadow-sm);
 }
 
 /* Itens de listbox (select / autocomplete) — mesmo hover do menu do usuário */
@@ -738,18 +820,18 @@ aside[data-collapsed="true"] .sidebar-copy,
 }
 
 .gommo-listbox-option:hover {
-    background: color-mix(in srgb, var(--color-digital-blue-500) 7%, transparent);
+    background: color-mix(in srgb, var(--gommo-primary) 6%, transparent);
     color: var(--color-base-content);
 }
 
 .gommo-listbox-option--active {
-    background: var(--color-digital-blue-50);
-    color: var(--color-digital-blue-700);
+    background: color-mix(in srgb, var(--gommo-primary) 8%, var(--color-base-100));
+    color: var(--gommo-primary-dark);
     font-variation-settings: "wght" 620;
 }
 
 .gommo-listbox-option--selected {
-    color: var(--color-digital-blue-700);
+    color: var(--gommo-primary-dark);
 }
 
 [data-theme="dark"] .gommo-listbox-option:hover {
@@ -765,21 +847,80 @@ aside[data-collapsed="true"] .sidebar-copy,
 
 /* CRUD list toolbar */
 .crud-list-toolbar {
-    border-color: color-mix(in srgb, var(--color-digital-blue-100) 50%, transparent);
-    background: color-mix(in srgb, var(--color-digital-blue-50) 35%, var(--color-base-100));
+    border-color: var(--gommo-border-subtle);
+    background: var(--color-base-100);
 }
 
 [data-theme="dark"] .crud-list-toolbar {
-    border-color: color-mix(in srgb, var(--color-base-content) 10%, transparent);
-    background: color-mix(in srgb, var(--color-primary) 8%, var(--color-base-100));
+    border-color: var(--gommo-border-subtle);
+    background: color-mix(in srgb, var(--color-base-content) 3%, var(--color-base-100));
+}
+
+/* CRUD — abas internas (estilo Linear) */
+.gommo-crud-tablist {
+    display: flex;
+    align-items: center;
+    gap: 0.125rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-bottom: 1px solid var(--gommo-border-subtle);
+    background: var(--color-base-100);
+    padding: 0 1rem;
+}
+
+[data-theme="dark"] .gommo-crud-tablist {
+    background: var(--color-base-100);
+}
+
+.gommo-crud-tab {
+    position: relative;
+    flex-shrink: 0;
+    cursor: pointer;
+    border: 0;
+    background: transparent;
+    padding: 0.625rem 0.75rem;
+    font: inherit;
+    font-size: 0.8125rem;
+    letter-spacing: -0.01em;
+    font-variation-settings: "wght" 500;
+    color: color-mix(in srgb, var(--color-base-content) 45%, transparent);
+    transition: color 0.12s ease;
+}
+
+.gommo-crud-tab:hover {
+    color: color-mix(in srgb, var(--color-base-content) 72%, transparent);
+}
+
+.gommo-crud-tab--active {
+    font-variation-settings: "wght" 600;
+    color: var(--gommo-primary);
+}
+
+[data-theme="dark"] .gommo-crud-tab--active {
+    color: var(--color-primary);
+}
+
+.gommo-crud-tab--active::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0.5rem;
+    bottom: 0;
+    height: 2px;
+    border-radius: 2px 2px 0 0;
+    background: var(--gommo-primary);
+}
+
+[data-theme="dark"] .gommo-crud-tab--active::after {
+    background: var(--color-primary);
 }
 
 .crud-tablist {
-    border-color: color-mix(in srgb, var(--color-digital-blue-100) 70%, transparent);
+    border-color: var(--gommo-border-subtle);
+    background: var(--color-base-100);
 }
 
 [data-theme="dark"] .crud-tablist {
-    border-color: color-mix(in srgb, var(--color-base-content) 10%, transparent);
+    border-color: var(--gommo-border-subtle);
 }
 
 /* Sidebar nav — sem scrollbar visível + fade inferior */
@@ -821,42 +962,41 @@ aside[data-collapsed="true"] .sidebar-copy,
 .sidebar-search-flyout {
     min-width: 15rem;
     border-radius: var(--gommo-control-radius);
-    border: 1px solid color-mix(in srgb, var(--color-digital-blue-200) 75%, transparent);
+    border: 1px solid var(--gommo-border);
     background: var(--color-base-100);
-    box-shadow: 0 4px 6px color-mix(in srgb, var(--color-digital-blue-900) 4%, transparent),
-    0 12px 28px color-mix(in srgb, var(--color-digital-blue-500) 14%, transparent);
+    box-shadow: var(--gommo-shadow-md);
 }
 
 .nav-item:hover {
-    background: color-mix(in srgb, var(--color-digital-blue-500) 7%, transparent);
-    color: var(--color-base-content);
+    background: color-mix(in srgb, var(--color-base-content) 4%, transparent);
+    color: color-mix(in srgb, var(--color-base-content) 88%, transparent);
 }
 
 .nav-item-active {
-    background: var(--color-digital-blue-50);
-    color: var(--color-digital-blue-700);
+    background: color-mix(in srgb, var(--gommo-primary) 8%, transparent);
+    color: var(--gommo-primary);
     font-variation-settings: "wght" 620;
 }
 
 [data-theme="dark"] .nav-item:hover {
-    background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+    background: color-mix(in srgb, var(--color-base-content) 6%, transparent);
 }
 
 [data-theme="dark"] .nav-item-active,
 [data-theme="dark"] .nav-item-active:hover {
-    background: color-mix(in srgb, var(--color-primary) 18%, transparent);
-    color: var(--color-primary);
+    background: color-mix(in srgb, var(--gommo-primary) 14%, transparent);
+    color: var(--gommo-primary-light);
 }
 
 .nav-item-active:hover {
-    background: color-mix(in srgb, var(--color-digital-blue-100) 75%, var(--color-digital-blue-50));
-    color: var(--color-digital-blue-700);
+    background: color-mix(in srgb, var(--gommo-primary) 10%, transparent);
+    color: var(--gommo-primary);
 }
 
 .nav-group-children {
     margin: 0.125rem 0 0.25rem 0.625rem;
     padding: 0.125rem 0 0.125rem 0.625rem;
-    border-left: 1px solid color-mix(in srgb, var(--color-digital-blue-200) 65%, transparent);
+    border-left: 1px solid var(--gommo-border-subtle);
 }
 
 [data-theme="dark"] .nav-group-children {
@@ -875,35 +1015,97 @@ aside[data-collapsed="true"] .sidebar-copy,
     border-radius: var(--gommo-control-radius);
     background: linear-gradient(
             90deg,
-            color-mix(in srgb, var(--color-digital-blue-100) 55%, var(--color-base-100)) 0%,
+            color-mix(in srgb, var(--gommo-primary-100) 45%, var(--color-base-100)) 0%,
             var(--color-base-100) 40%,
-            color-mix(in srgb, var(--color-digital-blue-100) 55%, var(--color-base-100)) 100%
+            color-mix(in srgb, var(--gommo-primary-100) 45%, var(--color-base-100)) 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s ease-in-out infinite;
 }
 
 /* ──────────────────────────────────────────────
-   Table refinements
-   (supplement daisyUI's .table)
+   Table (gommo — sem DaisyUI)
 ────────────────────────────────────────────── */
-.table th {
+.gommo-table {
+    width: 100%;
+    min-width: 640px;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.gommo-table--compact th,
+.gommo-table--compact td {
+    padding: 0.5rem 0.75rem;
+}
+
+.gommo-table th {
     font-size: 0.6875rem;
     font-variation-settings: "wght" 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: color-mix(in srgb, var(--color-base-content) 38%, transparent);
-    padding-top: 0.625rem;
-    padding-bottom: 0.625rem;
+    padding: 0.625rem 0.75rem;
+    background: color-mix(in srgb, var(--color-base-content) 2.5%, var(--color-base-100));
+    border-bottom: 1px solid var(--gommo-border-subtle);
 }
 
-.table td {
-    font-size: 0.875rem;
+[data-theme="dark"] .gommo-table th {
+    background: color-mix(in srgb, var(--color-base-content) 4%, var(--color-base-100));
+}
+
+.gommo-table td {
+    padding: 0.625rem 0.75rem;
     vertical-align: middle;
+    border-bottom: 1px solid var(--gommo-border-subtle);
 }
 
-.table tbody tr {
+.gommo-table tbody tr {
     transition: background 0.1s ease;
+}
+
+.gommo-table tbody tr:hover {
+    background: color-mix(in srgb, var(--color-base-content) 2.5%, transparent);
+}
+
+.gommo-table--striped tbody tr:nth-child(even) {
+    background: color-mix(in srgb, var(--color-base-content) 1.5%, transparent);
+}
+
+/* Badges de status */
+.gommo-badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 0.5rem;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    font-variation-settings: "wght" 600;
+    letter-spacing: 0.01em;
+    line-height: 1.25;
+}
+
+.gommo-badge--success {
+    background: color-mix(in srgb, var(--gommo-success) 12%, transparent);
+    color: var(--gommo-success);
+}
+
+.gommo-badge--warning {
+    background: color-mix(in srgb, var(--gommo-warning) 12%, transparent);
+    color: var(--gommo-warning);
+}
+
+.gommo-badge--error {
+    background: color-mix(in srgb, var(--gommo-error) 12%, transparent);
+    color: var(--gommo-error);
+}
+
+.gommo-badge--info {
+    background: color-mix(in srgb, var(--gommo-info) 12%, transparent);
+    color: var(--gommo-info);
+}
+
+.gommo-badge--neutral {
+    background: color-mix(in srgb, var(--color-base-content) 8%, transparent);
+    color: color-mix(in srgb, var(--color-base-content) 65%, transparent);
 }
 
 [data-theme="dark"] .border-digital-blue-100\/70,
@@ -925,14 +1127,6 @@ aside[data-collapsed="true"] .sidebar-copy,
 [data-theme="dark"] .text-digital-blue-600,
 [data-theme="dark"] .text-digital-blue-700 {
     color: var(--color-primary);
-}
-
-/* ──────────────────────────────────────────────
-   Badge refinements
-────────────────────────────────────────────── */
-.badge {
-    font-variation-settings: "wght" 620;
-    letter-spacing: 0.01em;
 }
 
 /* ──────────────────────────────────────────────
@@ -1027,6 +1221,101 @@ kbd {
 }
 
 /* ──────────────────────────────────────────────
+   Form sections (cadastros)
+────────────────────────────────────────────── */
+.gommo-form-section {
+    border-radius: var(--radius-gommo-card-lg);
+    border: 1px solid var(--gommo-border-subtle);
+    background: color-mix(in srgb, var(--color-base-content) 2%, var(--color-base-100));
+}
+
+[data-theme="dark"] .gommo-form-section {
+    background: color-mix(in srgb, var(--color-base-content) 4%, var(--color-base-100));
+    border-color: var(--gommo-border-subtle);
+}
+
+.gommo-form-section__header {
+    padding: 0.875rem 1.25rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--gommo-primary) 14%, var(--gommo-border-subtle));
+    background: color-mix(in srgb, var(--gommo-primary) 9%, var(--color-base-100));
+}
+
+[data-theme="dark"] .gommo-form-section__header {
+    border-bottom-color: color-mix(in srgb, var(--gommo-primary-light) 16%, transparent);
+    background: color-mix(in srgb, var(--gommo-primary) 14%, var(--color-base-100));
+}
+
+.gommo-form-section__title {
+    font-size: 0.8125rem;
+    font-variation-settings: "wght" 650;
+    letter-spacing: -0.01em;
+    color: var(--gommo-primary-dark);
+}
+
+[data-theme="dark"] .gommo-form-section__title {
+    color: var(--gommo-primary-light);
+}
+
+.gommo-form-section__description {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: color-mix(in srgb, var(--gommo-primary-dark) 55%, var(--color-base-content));
+}
+
+[data-theme="dark"] .gommo-form-section__description {
+    color: color-mix(in srgb, var(--gommo-primary-light) 70%, var(--color-base-content));
+}
+
+.gommo-form-section__body {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem 1.25rem;
+}
+
+@media (min-width: 640px) {
+    .gommo-form-section__body {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Formulário CRUD — scroll interno + rodapé fixo */
+.crud-form-shell {
+    display: flex;
+    min-height: 0;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.crud-form-shell__body {
+    min-height: 0;
+    flex: 1;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.crud-form-shell__footer {
+    flex-shrink: 0;
+    border-top: 1px solid var(--gommo-border-subtle);
+    background: var(--color-base-100);
+    padding: 0.75rem 1rem;
+}
+
+[data-theme="dark"] .crud-form-shell__footer {
+    background: var(--color-base-100);
+    border-top-color: var(--gommo-border-subtle);
+}
+
+.crud-form-shell__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* ──────────────────────────────────────────────
    Workspace (abas internas estilo navegador)
 ────────────────────────────────────────────── */
 html.gommo-workspace-active,
@@ -1035,37 +1324,37 @@ html.gommo-workspace-active body {
     height: 100%;
 }
 
-.login-hero-logo {
-    filter: brightness(0) invert(1);
+.workspace-content {
+    padding: var(--workspace-content-padding);
+    background: var(--color-page);
 }
 
-/* Conteúdo abaixo da trilha de abas — afastado só da sidebar */
-.workspace-content {
-    padding-inline: var(--workspace-content-padding);
+.workspace-panel {
+    min-height: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
 .workspace-tabbar,
 .workspace-tabbar-empty {
-    background: linear-gradient(
-        180deg,
-        color-mix(in srgb, var(--color-digital-blue-50) 65%, var(--color-base-100)) 0%,
-        color-mix(in srgb, var(--color-page) 55%, var(--color-base-100)) 100%
-    );
-    border-bottom: 1px solid color-mix(in srgb, var(--color-digital-blue-200) 40%, transparent);
+    flex-shrink: 0;
+    min-height: 2.5rem;
+    background: var(--color-page);
+    border-bottom: 1px solid var(--gommo-border-subtle);
 }
 
-[data-theme="dark"] .workspace-tabbar,
-[data-theme="dark"] .workspace-tabbar-empty {
-    background: linear-gradient(
-        180deg,
-        color-mix(in srgb, var(--color-base-200) 90%, var(--color-base-100)) 0%,
-        color-mix(in srgb, var(--color-base-100) 95%, transparent) 100%
-    );
-    border-bottom-color: color-mix(in srgb, var(--color-base-content) 10%, transparent);
+.workspace-tabbar-empty {
+    display: flex;
+    align-items: center;
+    padding-inline: 1rem;
+    font-size: 0.75rem;
+    color: color-mix(in srgb, var(--color-base-content) 42%, transparent);
 }
 
 .workspace-tabbar-actions {
-    border-left: 1px solid color-mix(in srgb, var(--color-digital-blue-200) 35%, transparent);
+    border-left: 1px solid var(--gommo-border-subtle);
 }
 
 [data-theme="dark"] .workspace-tabbar-actions {
@@ -1081,7 +1370,7 @@ html.gommo-workspace-active body {
 }
 
 .workspace-tabbar-menu-trigger:hover {
-    background: color-mix(in srgb, var(--color-base-100) 70%, transparent);
+    background: color-mix(in srgb, var(--color-base-content) 6%, transparent);
     color: var(--color-base-content);
 }
 
@@ -1107,29 +1396,51 @@ html.gommo-workspace-active body {
     background: color-mix(in srgb, var(--color-base-content) 22%, transparent);
 }
 
-.workspace-tabs-lift.tabs {
+.gommo-workspace-tabs {
+    display: flex;
     flex-wrap: nowrap;
-    align-items: flex-end;
-    gap: 0.125rem;
-    height: auto;
-    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 2.5rem;
+    padding: 0.25rem 0.5rem;
 }
 
-.workspace-tabs-lift .workspace-tab.tab {
+.gommo-workspace-tab {
     position: relative;
-    height: 2.25rem;
-    min-height: 2.25rem;
+    display: inline-flex;
+    height: 1.75rem;
+    min-height: 1.75rem;
+    max-height: 1.75rem;
     flex-shrink: 0;
-    color: color-mix(in srgb, var(--color-base-content) 62%, transparent);
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0 0.625rem;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    font-size: 0.8125rem;
+    letter-spacing: -0.01em;
+    font-variation-settings: "wght" 500;
+    color: color-mix(in srgb, var(--color-base-content) 52%, transparent);
+    transition: color 0.12s ease, background 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
 }
 
-.workspace-tabs-lift .workspace-tab.tab:not(.tab-active):hover {
-    color: color-mix(in srgb, var(--color-base-content) 88%, transparent);
+.gommo-workspace-tab:hover:not(.gommo-workspace-tab--active) {
+    color: color-mix(in srgb, var(--color-base-content) 78%, transparent);
+    background: color-mix(in srgb, var(--color-base-content) 4%, transparent);
 }
 
-.workspace-tabs-lift .workspace-tab.tab-active {
+.gommo-workspace-tab--active {
+    border-color: var(--gommo-border-subtle);
+    background: var(--color-base-100);
     color: var(--color-base-content);
-    font-variation-settings: "wght" 620;
+    font-variation-settings: "wght" 600;
+    box-shadow: var(--gommo-shadow-xs);
+}
+
+[data-theme="dark"] .gommo-workspace-tab--active {
+    background: var(--color-base-200);
+    border-color: var(--gommo-border);
 }
 
 .workspace-tab-close {
@@ -1138,13 +1449,150 @@ html.gommo-workspace-active body {
     transition: opacity 0.12s ease, background 0.12s ease, color 0.12s ease;
 }
 
-.workspace-tab:hover .workspace-tab-close,
-.workspace-tab.tab-active .workspace-tab-close {
+.gommo-workspace-tab:hover .workspace-tab-close,
+.gommo-workspace-tab--active .workspace-tab-close {
     opacity: 1;
 }
 
 .workspace-tab-close:hover {
     background: color-mix(in srgb, var(--color-base-content) 8%, transparent);
+    color: var(--color-base-content);
+}
+
+/* Modal de alerta (sem DaisyUI) */
+.gommo-modal-panel {
+    width: 100%;
+    max-width: 28rem;
+    overflow: hidden;
+    border-radius: 1rem;
+    border: 1px solid var(--gommo-border);
+    background: var(--color-base-100);
+    box-shadow: var(--gommo-shadow-lg);
+}
+
+.gommo-alert-banner {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    padding-inline-end: 2.75rem;
+}
+
+.gommo-alert-banner--warning {
+    background: color-mix(in srgb, var(--gommo-warning) 8%, var(--color-base-100));
+    color: var(--color-base-content);
+}
+
+.gommo-alert-banner--success {
+    background: color-mix(in srgb, var(--gommo-success) 8%, var(--color-base-100));
+}
+
+.gommo-alert-banner--info {
+    background: color-mix(in srgb, var(--gommo-info) 8%, var(--color-base-100));
+}
+
+.gommo-alert-banner--error {
+    background: color-mix(in srgb, var(--gommo-error) 8%, var(--color-base-100));
+}
+
+.gommo-alert-icon {
+    display: flex;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+}
+
+.gommo-alert-icon--warning {
+    background: color-mix(in srgb, var(--gommo-warning) 15%, transparent);
+    color: var(--gommo-warning);
+}
+
+.gommo-alert-icon--success {
+    background: color-mix(in srgb, var(--gommo-success) 15%, transparent);
+    color: var(--gommo-success);
+}
+
+.gommo-alert-icon--info {
+    background: color-mix(in srgb, var(--gommo-info) 15%, transparent);
+    color: var(--gommo-info);
+}
+
+.gommo-alert-icon--error {
+    background: color-mix(in srgb, var(--gommo-error) 15%, transparent);
+    color: var(--gommo-error);
+}
+
+.gommo-modal-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    border-top: 1px solid var(--gommo-border-subtle);
+    padding: 1rem 1.25rem;
+}
+
+/* Breadcrumb (sem DaisyUI) */
+.gommo-breadcrumbs ul {
+    display: flex;
+    min-width: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.gommo-breadcrumb-link {
+    color: color-mix(in srgb, var(--color-base-content) 55%, transparent);
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.gommo-breadcrumb-link:hover {
+    color: var(--gommo-primary);
+}
+
+.gommo-breadcrumb-sep {
+    color: color-mix(in srgb, var(--color-base-content) 30%, transparent);
+    user-select: none;
+}
+
+/* Progress ring (dashboard) */
+.gommo-progress-ring {
+    --progress: 0;
+    position: relative;
+    display: flex;
+    width: 5.5rem;
+    height: 5.5rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    background: conic-gradient(
+        var(--gommo-primary) calc(var(--progress) * 1%),
+        color-mix(in srgb, var(--color-base-content) 10%, transparent) 0
+    );
+}
+
+.gommo-progress-ring::before {
+    content: "";
+    position: absolute;
+    inset: 6px;
+    border-radius: 9999px;
+    background: var(--color-base-100);
+}
+
+[data-theme="dark"] .gommo-progress-ring::before {
+    background: var(--color-base-200);
+}
+
+.gommo-progress-ring__value {
+    position: relative;
+    z-index: 1;
+    font-size: 1.125rem;
+    font-weight: 700;
     color: var(--color-base-content);
 }
 
@@ -1176,8 +1624,17 @@ button:disabled,
 /* ── System alert modal (acima de pickers e workspace) ── */
 .system-alert-modal {
     z-index: 300;
+    margin: auto;
+    max-width: calc(100vw - 2rem);
+    padding: 0;
+    border: none;
+    background: transparent;
 }
 
 .system-alert-modal::backdrop {
-    background: rgb(10 22 40 / 0.45);
+    background: rgb(15 23 42 / 0.4);
+}
+
+.system-alert-modal[open] .gommo-modal-panel {
+    animation: scale-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
 }

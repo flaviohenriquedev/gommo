@@ -2,6 +2,10 @@
 
 import type {ComponentType} from "react";
 import {InputsPlaygroundClient} from "@/app/(system)/dev/inputs/InputsPlaygroundClient";
+import {CollaboratorFormClient} from "@/modules/collaborator/components/CollaboratorFormClient";
+import {CollaboratorListClient} from "@/modules/collaborator/components/CollaboratorListClient";
+import {CollaboratorPeoplePrimaryAction} from "@/modules/collaborator/components/CollaboratorPeoplePrimaryAction";
+import type {Collaborator} from "@/modules/collaborator/dto/collaborator.dto";
 import {AdmissionHistoryListClient} from "@/modules/admission/components/AdmissionHistoryListClient";
 import {AdmissionProcessFormClient} from "@/modules/admission/components/AdmissionProcessFormClient";
 import {AdmissionProcessListClient} from "@/modules/admission/components/AdmissionProcessListClient";
@@ -49,6 +53,26 @@ function AdmissionPage() {
             fieldTabName="fullName"
             list={<AdmissionProcessListClient/>}
             form={<AdmissionProcessFormClient/>}
+        />
+    );
+}
+
+function CollaboratorPeoplePage() {
+    return (
+        <TabbedCrudPage<Collaborator>
+            routeId="collaborator-people"
+            href="/collaborator/people"
+            routeLabel="Pessoas"
+            tabShortLabel="Pessoa"
+            fieldTabName="fullName"
+            editOnly
+            showListToFormButton={false}
+            listPrimaryAction={<CollaboratorPeoplePrimaryAction/>}
+            listToolbar="Consulte e edite dados pessoais. Novos colaboradores entram somente pela admissão."
+            formTabLabel="Dados pessoais"
+            formTabLabelEdit="Editar pessoa"
+            list={<CollaboratorListClient/>}
+            form={<CollaboratorFormClient/>}
         />
     );
 }
@@ -112,6 +136,7 @@ export const WORKSPACE_PAGE_REGISTRY: WorkspacePageEntry[] = [
             form={<JobPositionFormClient/>}
         />
     )},
+    {href: "/collaborator/people", Component: CollaboratorPeoplePage},
     {href: "/collaborator/admission", Component: AdmissionPage},
     {href: "/collaborator/history", Component: CollaboratorHistoryPage},
     {href: "/contract", Component: () => (

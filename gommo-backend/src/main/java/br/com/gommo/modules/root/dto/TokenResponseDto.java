@@ -11,4 +11,6 @@ public class TokenResponseDto {
     private final String refreshToken;
     private final String tokenType;
     private final long expiresInSeconds;
+    private final String username;
+    private final String email;
 }

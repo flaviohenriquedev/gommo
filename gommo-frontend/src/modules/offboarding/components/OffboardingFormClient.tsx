@@ -9,6 +9,7 @@ import { emptyOffboardingForm, offboardingToFormDto } from "@/modules/offboardin
 import { offboardingKeys } from "@/modules/offboarding/offboarding.query";
 import { offboardingService } from "@/modules/offboarding/services/offboarding.service";
 import { useCrudScreen } from "@/shared/components/crud/CrudScreen";
+import { CrudFormShell } from "@/shared/components/crud/CrudFormShell";
 import { EntityAttachments } from "@/shared/components/storage/EntityAttachments";
 import { ExceptionCapture } from "@/shared/exceptions";
 import { Button } from "@/shared/components/ui/Button";
@@ -68,7 +69,7 @@ export function OffboardingFormClient() {
         setForm((prev) => ({ ...prev, [field]: value }));
     };
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError(null);
         saveMutation.mutate(form);
@@ -79,8 +80,21 @@ export function OffboardingFormClient() {
     }
 
     return (
-        <div className="grid gap-6 p-4">
-            <form onSubmit={handleSubmit} className="grid gap-3 sm:grid-cols-2">
+        <CrudFormShell
+            onSubmit={handleSubmit}
+            footer={
+                <>
+                    <Button type="button" variant="ghost" onClick={goToList}>
+                        Cancelar
+                    </Button>
+                    <Button type="submit" loading={saveMutation.isPending}>
+                        {isEditing ? "Salvar" : "Cadastrar"}
+                    </Button>
+                </>
+            }
+        >
+            <div className="flex flex-col gap-6 p-4">
+                <div className="grid gap-3 sm:grid-cols-2">
                 <div className="sm:col-span-2">
                     <p className="text-sm font-semibold text-base-content">
                         {isEditing ? "Editar desligamento" : "Novo desligamento"}
@@ -109,16 +123,13 @@ export function OffboardingFormClient() {
                     wrapperClassName="sm:col-span-2"
                 />
                 {error && <p className="text-sm font-medium text-error sm:col-span-2">{error}</p>}
-                <div className="flex flex-wrap gap-2 sm:col-span-2">
-                    <Button type="submit" loading={saveMutation.isPending}>{isEditing ? "Salvar" : "Cadastrar"}</Button>
-                    <Button type="button" variant="ghost" onClick={goToList}>Cancelar</Button>
                 </div>
-            </form>
 
-            <div className="rounded-lg border border-base-300/60 p-4">
-                <p className="mb-3 text-sm font-semibold text-base-content">Documentos</p>
-                <EntityAttachments entityType="offboarding" entityId={editingId} />
+                <div className="rounded-lg border border-[var(--gommo-border-subtle)] p-4">
+                    <p className="mb-3 text-sm font-semibold text-base-content">Documentos</p>
+                    <EntityAttachments entityType="offboarding" entityId={editingId} />
+                </div>
             </div>
-        </div>
+        </CrudFormShell>
     );
 }

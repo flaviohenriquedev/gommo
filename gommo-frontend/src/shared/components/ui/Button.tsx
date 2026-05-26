@@ -61,9 +61,7 @@ export function Button({
       disabled={disabled || loading}
       {...props}
     >
-      {loading && (
-        <span className="loading loading-spinner loading-xs text-current" />
-      )}
+      {loading && <span className="gommo-spinner" aria-hidden />}
       {!loading && leftIcon}
       {children}
       {!loading && rightIcon}

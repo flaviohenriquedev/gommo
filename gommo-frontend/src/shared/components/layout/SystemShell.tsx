@@ -1,7 +1,6 @@
 "use client";
 
 import {Bell, Command, Menu, Search} from "lucide-react";
-import {motion} from "framer-motion";
 import {useSession} from "next-auth/react";
 import {type ReactNode, useEffect, useState} from "react";
 import {HeaderUserMenu} from "@/shared/components/layout/HeaderUserMenu";
@@ -56,7 +55,7 @@ export function SystemShell({children}: { children: ReactNode }) {
 
                     {/* Search bar */}
                     <label className="gommo-field relative min-w-0 flex-1 cursor-text sm:max-w-xs lg:max-w-sm">
-                        <Search className="size-4 shrink-0 text-digital-blue-400" strokeWidth={2}/>
+                        <Search className="size-4 shrink-0 text-primary/60" strokeWidth={2}/>
                         <input
                             type="search"
                             placeholder="Buscar no sistema…"
@@ -69,7 +68,7 @@ export function SystemShell({children}: { children: ReactNode }) {
 
                     {/* Right controls */}
                     <div className="flex items-center gap-1 sm:gap-1.5">
-                        <div className="mx-1 hidden h-5 w-px bg-digital-blue-200/60 dark:bg-base-content/12 sm:block"/>
+                        <div className="mx-1 hidden h-5 w-px bg-base-content/10 sm:block"/>
 
                         <ThemeToggle/>
 
@@ -88,11 +87,8 @@ export function SystemShell({children}: { children: ReactNode }) {
                     </div>
                 </header>
 
-                <motion.main
+                <main
                     id="main-content"
-                    initial={{opacity: 0, y: 4}}
-                    animate={{opacity: 1, y: 0}}
-                    transition={{duration: 0.35, ease: [0.22, 1, 0.36, 1]}}
                     className="relative flex min-h-0 flex-1 flex-col overflow-hidden"
                 >
                     <SidebarEdgeToggle
@@ -100,7 +96,7 @@ export function SystemShell({children}: { children: ReactNode }) {
                         onToggle={() => setCollapsed((v) => !v)}
                     />
                     {children}
-                </motion.main>
+                </main>
             </div>
         </div>
     );

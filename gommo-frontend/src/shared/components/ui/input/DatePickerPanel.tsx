@@ -51,7 +51,7 @@ export const DatePickerPanel = forwardRef<HTMLDivElement, DatePickerPanelProps>(
     return createPortal(
       <div
         ref={ref}
-        className="gommo-date-picker-panel fixed z-[200] rounded-box border border-base-300/80 bg-base-100 p-2 shadow-xl"
+        className="gommo-date-picker-panel surface-popover fixed z-[200] p-2"
         style={{
           top: position.top,
           left: position.left,

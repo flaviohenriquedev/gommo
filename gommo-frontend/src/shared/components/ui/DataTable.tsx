@@ -53,7 +53,7 @@ function renderCellContent(value: unknown, dataType?: TableDataType): ReactNode 
         return (
             <a
                 href={`mailto:${email}`}
-                className="text-digital-blue-600 underline-offset-2 hover:underline"
+                className="text-primary underline-offset-2 hover:underline"
             >
                 {email}
             </a>
@@ -62,12 +62,7 @@ function renderCellContent(value: unknown, dataType?: TableDataType): ReactNode 
 
     if (dataType === TableDataType.BADGE && value != null && value !== "") {
         return (
-            <span
-                className={clsx(
-                    "badge badge-sm rounded-lg border-0 px-2 py-0.5 font-semibold",
-                    badgeClassForStatus(value),
-                )}
-            >
+            <span className={clsx("gommo-badge", badgeClassForStatus(value))}>
         {formatCellValue(value, TableDataType.BADGE)}
       </span>
         );
@@ -118,18 +113,13 @@ export function DataTable<T extends object>({
         <div className="overflow-x-auto">
             <table
                 className={clsx(
-                    "table w-full min-w-[640px]",
-                    compact && "table-sm",
-                    striped && "table-zebra",
+                    "gommo-table",
+                    compact && "gommo-table--compact",
+                    striped && "gommo-table--striped",
                 )}
             >
-                <thead
-                    className={clsx(
-                        stickyHeader && "sticky top-0 z-[1]",
-                        "bg-digital-blue-50/60 dark:bg-base-200/80",
-                    )}
-                >
-                <tr className="border-b border-digital-blue-100/70 dark:border-base-content/10">
+                <thead className={clsx(stickyHeader && "sticky top-0 z-[1]")}>
+                <tr>
                     {columns.map((col) => (
                         <th
                             key={col.id}
@@ -178,10 +168,7 @@ export function DataTable<T extends object>({
                                         : undefined
                                 }
                                 className={clsx(
-                                    "border-digital-blue-50/80 transition-colors duration-100 dark:border-base-content/8",
-                                    striped && index % 2 === 0 && "bg-digital-blue-50/30 dark:bg-base-200/35",
-                                    interactive && "cursor-pointer hover:bg-digital-blue-50/60 dark:hover:bg-primary/10",
-                                    !striped && !interactive && "hover:bg-base-200/50",
+                                    interactive && "cursor-pointer",
                                 )}
                             >
                                 {columns.map((col) => {

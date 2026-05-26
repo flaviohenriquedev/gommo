@@ -21,13 +21,13 @@ export function WorkspaceTabBar({tabs, activeTabId, onSelect, onClose}: Workspac
     if (tabs.length === 0) return null;
 
     return (
-        <div className="workspace-tabbar flex min-h-11 shrink-0 items-stretch">
+        <div className="workspace-tabbar flex shrink-0 items-stretch">
             <div
                 ref={scrollRef}
                 className="workspace-tabbar-scroll flex min-w-0 flex-1 items-end overflow-x-auto overflow-y-hidden"
                 aria-label="Módulos abertos"
             >
-                <div role="tablist" className="tabs tabs-lift workspace-tabs-lift">
+                <div role="tablist" className="gommo-workspace-tabs">
                     {tabs.map((tab) => {
                         const active = tab.id === activeTabId;
                         const title = formatWorkspaceTabTitle(tab);
@@ -42,8 +42,8 @@ export function WorkspaceTabBar({tabs, activeTabId, onSelect, onClose}: Workspac
                                 title={title}
                                 onClick={() => onSelect(tab.id)}
                                 className={clsx(
-                                    "tab workspace-tab group/tab max-w-[240px] min-w-[120px] gap-2 px-3",
-                                    active && "tab-active",
+                                    "gommo-workspace-tab group/tab max-w-[240px] min-w-[120px]",
+                                    active && "gommo-workspace-tab--active",
                                 )}
                             >
                                 <WorkspaceTabIcon
@@ -51,11 +51,11 @@ export function WorkspaceTabBar({tabs, activeTabId, onSelect, onClose}: Workspac
                                     className={clsx(
                                         "size-3.5 shrink-0 transition-colors",
                                         active
-                                            ? "text-digital-blue-600 dark:text-primary"
+                                            ? "text-primary"
                                             : "text-base-content/40 group-hover/tab:text-base-content/60",
                                     )}
                                 />
-                                <span className="min-w-0 flex-1 truncate text-left text-[12px] font-medium tracking-tight">
+                                <span className="min-w-0 flex-1 truncate text-left tracking-tight">
                                     {title}
                                 </span>
                                 {!isDashboard ? (
@@ -94,7 +94,7 @@ export function WorkspaceTabBar({tabs, activeTabId, onSelect, onClose}: Workspac
 
 export function WorkspaceTabBarEmptyHint() {
     return (
-        <div className="workspace-tabbar-empty flex items-center gap-2 px-4 py-2.5 text-[12px] text-base-content/45">
+        <div className="workspace-tabbar-empty gap-2">
             <LayoutGrid className="size-3.5"/>
             Nenhuma aba aberta — exibindo o painel inicial
         </div>

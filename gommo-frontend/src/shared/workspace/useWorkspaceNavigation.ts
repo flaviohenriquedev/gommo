@@ -98,6 +98,24 @@ export function useWorkspaceNavigation() {
         [focusTab, openRecordTab, syncUrl],
     );
 
+    const openRouteCreate = useCallback(
+        (route: AppRoute, shortLabel?: string) => {
+            const input = routeToInput(route, shortLabel);
+            const tabId = buildWorkspaceTabId(input.routeId, "new");
+            const existing = useWorkspaceStore.getState().tabs.find((t) => t.id === tabId);
+            if (existing) {
+                focusTab(tabId);
+            } else {
+                openRecordTab({
+                    ...input,
+                    entityKey: "new",
+                });
+            }
+            syncUrl(input.href, {isNew: true});
+        },
+        [focusTab, openRecordTab, syncUrl],
+    );
+
     const openFromHref = useCallback(
         (href: string) => {
             const route = findRouteByHref(href);
@@ -132,6 +150,7 @@ export function useWorkspaceNavigation() {
     return {
         openRouteModule,
         openRouteRecord,
+        openRouteCreate,
         openFromHref,
         focusTabById,
         syncCrudUrl,

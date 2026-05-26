@@ -115,12 +115,12 @@ function formatBadgeLabel(value: unknown): string {
 
 export function badgeClassForStatus(value: unknown): string {
   const normalized = String(value).toUpperCase();
-  if (normalized === "ACTIVE") return "badge-success";
-  if (normalized === "INACTIVE") return "badge-warning";
-  if (normalized === "DELETED") return "badge-error";
-  if (normalized === "DRAFT") return "bg-base-300/60 text-base-content/65";
-  if (normalized === "IN_PROGRESS") return "badge-info";
-  if (normalized === "COMPLETED") return "badge-success";
-  if (normalized === "CANCELLED") return "badge-error";
-  return "bg-base-300/60 text-base-content/65";
+  if (normalized === "ACTIVE") return "gommo-badge--success";
+  if (normalized === "INACTIVE") return "gommo-badge--warning";
+  if (normalized === "DELETED") return "gommo-badge--error";
+  if (normalized === "DRAFT") return "gommo-badge--neutral";
+  if (normalized === "IN_PROGRESS") return "gommo-badge--info";
+  if (normalized === "COMPLETED") return "gommo-badge--success";
+  if (normalized === "CANCELLED") return "gommo-badge--error";
+  return "gommo-badge--neutral";
 }

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-/** Cadastro direto de colaborador foi removido do menu; entrada é via admissão. */
+/** Entrada do módulo Colaboradores — listagem de pessoas. */
 export default function CollaboratorPage() {
-    redirect("/collaborator/admission");
+    redirect("/collaborator/people");
 }

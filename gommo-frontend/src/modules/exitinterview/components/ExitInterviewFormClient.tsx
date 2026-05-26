@@ -9,6 +9,7 @@ import { emptyExitInterviewForm, exitinterviewToFormDto } from "@/modules/exitin
 import { exitinterviewKeys } from "@/modules/exitinterview/exitinterview.query";
 import { exitinterviewService } from "@/modules/exitinterview/services/exit-interview.service";
 import { useCrudScreen } from "@/shared/components/crud/CrudScreen";
+import { CrudFormShell } from "@/shared/components/crud/CrudFormShell";
 import { ExceptionCapture } from "@/shared/exceptions";
 import { Button } from "@/shared/components/ui/Button";
 import { InputString, InputDate } from "@/shared/components/ui/input/index";
@@ -59,7 +60,7 @@ export function ExitInterviewFormClient() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     saveMutation.mutate(form);
@@ -79,7 +80,17 @@ export function ExitInterviewFormClient() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-3 p-4 sm:grid-cols-2">
+    <CrudFormShell
+      onSubmit={handleSubmit}
+      footer={
+        <>
+          <Button type="button" variant="ghost" onClick={goToList}>Cancelar</Button>
+          {isEditing && <Button type="button" variant="outline" onClick={startCreate}>Novo</Button>}
+          <Button type="submit" loading={saveMutation.isPending}>{isEditing ? "Salvar" : "Cadastrar"}</Button>
+        </>
+      }
+    >
+    <div className="grid gap-3 p-4 sm:grid-cols-2">
       <div className="sm:col-span-2">
         <p className="text-sm font-semibold text-base-content">{isEditing ? "Editar entrevista de desligamento" : "Novo(a) entrevista de desligamento"}</p>
       </div>
@@ -88,11 +99,7 @@ export function ExitInterviewFormClient() {
       <InputString label="Departure Reason" value={form.departureReason ?? ""} onValueChange={(v) => update("departureReason", v)}  />
       <InputString label="Feedback" value={form.feedback ?? ""} onValueChange={(v) => update("feedback", v)} wrapperClassName="sm:col-span-2" />
       {error && <p className="text-sm font-medium text-error sm:col-span-2">{error}</p>}
-      <div className="flex flex-wrap gap-2 sm:col-span-2">
-        <Button type="submit" loading={saveMutation.isPending}>{isEditing ? "Salvar" : "Cadastrar"}</Button>
-        <Button type="button" variant="ghost" onClick={goToList}>Cancelar</Button>
-        {isEditing && <Button type="button" variant="outline" onClick={startCreate}>Novo</Button>}
-      </div>
-    </form>
+    </div>
+    </CrudFormShell>
   );
 }

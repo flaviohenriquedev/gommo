@@ -7,6 +7,7 @@ import {usePathname} from "next/navigation";
 import {useEffect, useMemo, useRef, useState, type MouseEvent} from "react";
 import {APP_ROUTES, type AppRoute, flattenRoutes, NAV_SECTIONS} from "@/config/routes";
 import {SidebarFlyout} from "@/shared/components/layout/SidebarFlyout";
+import {GommoLogo} from "@/shared/components/layout/GommoLogo";
 import {useWorkspaceNavigation} from "@/shared/workspace/useWorkspaceNavigation";
 import {useWorkspaceStore} from "@/shared/workspace/workspace.store";
 
@@ -129,7 +130,7 @@ export function Sidebar({collapsed, mobileOpen = false, onMobileCloseAction}: Si
                     className={clsx(
                         "size-4.25 shrink-0 transition-colors duration-150",
                         active
-                            ? "text-digital-blue-600"
+                            ? "text-primary"
                             : "text-base-content/38 group-hover:text-base-content/65",
                     )}
                     strokeWidth={active ? 2.25 : 2}
@@ -226,30 +227,9 @@ export function Sidebar({collapsed, mobileOpen = false, onMobileCloseAction}: Si
                 style={{borderColor: "var(--sidebar-border)", background: "var(--sidebar-bg)"}}
             >
                 {panelCollapsed ? (
-                    <img
-                        src="/brand/gommo-logo-icon.png"
-                        alt="Gommo"
-                        width={32}
-                        height={32}
-                        className="h-8 w-8 shrink-0 rounded-lg object-contain"
-                    />
+                    <GommoLogo variant="icon" />
                 ) : (
-                    <>
-                        <img
-                            src="/brand/gommo-logo-full.png"
-                            alt="Gommo"
-                            width={160}
-                            height={44}
-                            className="sidebar-logo-light h-9 w-auto max-w-[160px] shrink-0 object-contain object-left"
-                        />
-                        <img
-                            src="/brand/gommo-logo-white.png"
-                            alt="Gommo"
-                            width={160}
-                            height={44}
-                            className="sidebar-logo-dark h-9 w-auto max-w-[160px] shrink-0 object-contain object-left"
-                        />
-                    </>
+                    <GommoLogo />
                 )}
             </div>
 
@@ -264,10 +244,10 @@ export function Sidebar({collapsed, mobileOpen = false, onMobileCloseAction}: Si
                             aria-expanded={searchFlyoutVisible}
                             onClick={openSearchFlyout}
                             className={clsx(
-                                "flex size-9 shrink-0 items-center justify-center rounded-lg border bg-base-100 text-digital-blue-500 transition-colors duration-200",
+                                "flex size-9 shrink-0 items-center justify-center rounded-lg border bg-base-100 text-primary/80 transition-colors duration-200",
                                 searchFlyoutVisible
-                                    ? "border-digital-blue-300 bg-digital-blue-50 text-digital-blue-600 dark:border-primary/35 dark:bg-primary/15 dark:text-primary"
-                                    : "hover:border-digital-blue-200 hover:bg-digital-blue-50/70 dark:hover:border-primary/25 dark:hover:bg-primary/10",
+                                    ? "border-primary/30 bg-primary/8 text-primary"
+                                    : "hover:border-primary/20 hover:bg-primary/5 hover:text-primary",
                             )}
                             style={{borderColor: searchFlyoutVisible ? undefined : "var(--sidebar-border)"}}
                         >
@@ -275,7 +255,7 @@ export function Sidebar({collapsed, mobileOpen = false, onMobileCloseAction}: Si
                         </button>
                     ) : (
                         <label className="gommo-field h-9! min-h-9! w-full rounded-lg! text-sm!">
-                            <Search className="size-3.5 shrink-0 text-digital-blue-400" strokeWidth={2}/>
+                            <Search className="size-3.5 shrink-0 text-primary/60" strokeWidth={2}/>
                             <input
                                 type="search"
                                 placeholder="Buscar no menu..."
@@ -380,7 +360,7 @@ export function Sidebar({collapsed, mobileOpen = false, onMobileCloseAction}: Si
                             onMouseDown={(e) => e.stopPropagation()}
                         >
                             <label className="gommo-field h-9! min-h-9! w-60 rounded-lg! text-sm!">
-                                <Search className="size-3.5 shrink-0 text-digital-blue-400" strokeWidth={2}/>
+                                <Search className="size-3.5 shrink-0 text-primary/60" strokeWidth={2}/>
                                 <input
                                     ref={searchInputRef}
                                     type="search"

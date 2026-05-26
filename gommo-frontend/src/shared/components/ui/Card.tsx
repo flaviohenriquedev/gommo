@@ -14,6 +14,8 @@ type CardProps = {
     headerAction?: ReactNode;
     /** Enables a subtle lift on hover — good for interactive/clickable cards */
     hoverable?: boolean;
+    /** Animação de entrada (desligar em CRUD/workspace para evitar jump). */
+    animate?: boolean;
 };
 
 export function Card({
@@ -25,21 +27,19 @@ export function Card({
                          subtitle,
                          headerAction,
                          hoverable = false,
+                         animate = true,
                      }: CardProps) {
-    return (
-        <motion.div
-            initial={{opacity: 0, y: 8}}
-            animate={{opacity: 1, y: 0}}
-            transition={{duration: 0.38, delay, ease: [0.22, 1, 0.36, 1]}}
-            className={clsx(
-                "surface-card overflow-hidden",
-                hoverable && "surface-card--hover cursor-pointer",
-                className,
-            )}
-        >
+    const surfaceClass = clsx(
+        "surface-card overflow-hidden",
+        hoverable && "surface-card--hover cursor-pointer",
+        className,
+    );
+
+    const inner = (
+        <>
             {(title || subtitle || headerAction) && (
                 <div
-                    className="flex items-center justify-between gap-4 border-b border-digital-blue-100/60 px-5 py-4 md:px-6">
+                    className="flex items-center justify-between gap-4 border-b border-base-content/8 px-5 py-4 md:px-6">
                     <div className="min-w-0 flex-1">
                         {title && (
                             <h3 className="truncate text-[13px] font-bold tracking-tight text-base-content">
@@ -56,6 +56,21 @@ export function Card({
                 </div>
             )}
             <div className={clsx("p-5 md:p-6", bodyClassName)}>{children}</div>
+        </>
+    );
+
+    if (!animate) {
+        return <div className={surfaceClass}>{inner}</div>;
+    }
+
+    return (
+        <motion.div
+            initial={{opacity: 0}}
+            animate={{opacity: 1}}
+            transition={{duration: 0.22, delay, ease: [0.22, 1, 0.36, 1]}}
+            className={surfaceClass}
+        >
+            {inner}
         </motion.div>
     );
 }

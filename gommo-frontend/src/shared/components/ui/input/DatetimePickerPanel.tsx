@@ -77,7 +77,7 @@ export const DatetimePickerPanel = forwardRef<HTMLDivElement, DatetimePickerPane
     return createPortal(
       <div
         ref={ref}
-        className="gommo-datetime-picker-panel fixed z-[200] overflow-hidden rounded-box border border-base-300/80 bg-base-100 shadow-xl"
+        className="gommo-datetime-picker-panel surface-popover fixed z-[200] overflow-hidden"
         style={{
           top: position.top,
           left: position.left,
@@ -104,7 +104,7 @@ export const DatetimePickerPanel = forwardRef<HTMLDivElement, DatetimePickerPane
           defaultMonth={selected ?? new Date()}
         />
 
-        <div className="grid grid-cols-2 gap-px border-t border-base-300/60 bg-base-300/40">
+        <div className="grid grid-cols-2 gap-px border-t border-[var(--gommo-border-subtle)] bg-[var(--gommo-border-subtle)]">
           <TimeColumn
             label="Hora"
             items={DATETIME_HOUR_ITEMS}
@@ -142,8 +142,8 @@ function TimeColumn({
   onPick: (v: string) => void;
 }) {
   return (
-    <div className="flex max-h-36 flex-col bg-base-100">
-      <p className="shrink-0 border-b border-base-300/50 px-2 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wide text-base-content/50">
+    <div className="flex max-h-36 flex-col bg-[var(--color-base-100)]">
+      <p className="shrink-0 border-b border-[var(--gommo-border-subtle)] px-2 py-1.5 text-center text-[10px] font-semibold uppercase tracking-wide text-base-content/50">
         {label}
       </p>
       <ul className="overflow-y-auto py-1" role="listbox" aria-label={label}>

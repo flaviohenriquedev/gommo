@@ -68,7 +68,7 @@ export function InputSelectPanel({
                 </span>
                                 {selected && (
                                     <Check
-                                        className="mt-0.5 size-4 shrink-0 text-digital-blue-600 dark:text-primary"
+                                        className="mt-0.5 size-4 shrink-0 text-primary"
                                         aria-hidden
                                     />
                                 )}

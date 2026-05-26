@@ -1,4 +1,5 @@
 import { LoginForm } from "@/app/(auth)/login/LoginForm";
+import { GommoLogo } from "@/shared/components/layout/GommoLogo";
 import { ThemeToggle } from "@/shared/components/layout/ThemeToggle";
 
 export default function LoginPage() {
@@ -9,25 +10,19 @@ export default function LoginPage() {
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(145deg, var(--color-digital-blue-600) 0%, var(--color-digital-blue-500) 42%, var(--color-digital-blue-300) 100%)",
+              "linear-gradient(145deg, var(--gommo-primary-dark) 0%, var(--gommo-primary) 42%, var(--gommo-primary-light) 100%)",
           }}
         />
         <div
           className="absolute inset-0 opacity-40"
           style={{
             background:
-              "radial-gradient(circle at 15% 20%, white 0%, transparent 45%), radial-gradient(circle at 85% 80%, var(--color-digital-blue-200) 0%, transparent 50%)",
+              "radial-gradient(circle at 15% 20%, white 0%, transparent 45%), radial-gradient(circle at 85% 80%, var(--gommo-primary-200) 0%, transparent 50%)",
           }}
         />
 
         <div className="relative z-10 flex flex-1 flex-col justify-center px-14 xl:px-20">
-            <img
-              src="/brand/gommo-logo-full.png"
-              alt="Gommo"
-              width={180}
-              height={48}
-              className="login-hero-logo mb-8 h-12 w-auto max-w-[180px] object-contain object-left"
-            />
+          <GommoLogo onBrand className="mb-8 h-12 max-w-[180px]" />
           <h1 className="max-w-lg text-4xl font-bold leading-[1.08] tracking-tight text-white xl:text-[2.75rem]">
             RH moderno para equipes que exigem precisão.
           </h1>
@@ -47,16 +42,10 @@ export default function LoginPage() {
         </div>
 
         <div className="w-full max-w-[24rem]">
-          <div className="mb-8 text-center lg:hidden">
-            <img
-              src="/brand/gommo-logo-full.png"
-              alt="Gommo"
-              width={140}
-              height={40}
-              className="mx-auto mb-3 h-10 w-auto max-w-[140px] object-contain"
-            />
+          <div className="mb-8 flex flex-col items-center lg:hidden">
+            <GommoLogo className="mx-auto h-10 max-w-[140px] object-contain" />
             <h1 className="sr-only">Gommo</h1>
-            <p className="mt-0.5 text-sm text-base-content/50">Departamento Pessoal</p>
+            <p className="mt-3 text-sm text-base-content/50">Departamento Pessoal</p>
           </div>
 
           <div className="surface-card p-8">

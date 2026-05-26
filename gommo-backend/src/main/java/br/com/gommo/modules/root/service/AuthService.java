@@ -122,6 +122,8 @@ public class AuthService implements IAuthService {
                 .refreshToken(refreshToken)
                 .tokenType("Bearer")
                 .expiresInSeconds(jwtProperties.accessTokenMinutes() * 60)
+                .username(user.getUsername())
+                .email(user.getEmail())
                 .build();
     }
 

@@ -9,6 +9,7 @@ import { emptyEmploymentContractForm, employmentcontractToFormDto } from "@/modu
 import { employmentcontractKeys } from "@/modules/contract/contract.query";
 import { employmentcontractService } from "@/modules/contract/services/employment-contract.service";
 import { useCrudScreen } from "@/shared/components/crud/CrudScreen";
+import { CrudFormShell } from "@/shared/components/crud/CrudFormShell";
 import { ExceptionCapture } from "@/shared/exceptions";
 import { Button } from "@/shared/components/ui/Button";
 import { InputString, InputDate, InputCurrency, InputSelect } from "@/shared/components/ui/input/index";
@@ -63,7 +64,7 @@ export function EmploymentContractFormClient() {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     saveMutation.mutate(form);
@@ -83,7 +84,17 @@ export function EmploymentContractFormClient() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-3 p-4 sm:grid-cols-2">
+    <CrudFormShell
+      onSubmit={handleSubmit}
+      footer={
+        <>
+          <Button type="button" variant="ghost" onClick={goToList}>Cancelar</Button>
+          {isEditing && <Button type="button" variant="outline" onClick={startCreate}>Novo</Button>}
+          <Button type="submit" loading={saveMutation.isPending}>{isEditing ? "Salvar" : "Cadastrar"}</Button>
+        </>
+      }
+    >
+    <div className="grid gap-3 p-4 sm:grid-cols-2">
       <div className="sm:col-span-2">
         <p className="text-sm font-semibold text-base-content">{isEditing ? "Editar contrato" : "Novo(a) contrato"}</p>
       </div>
@@ -103,11 +114,7 @@ export function EmploymentContractFormClient() {
       <InputDate label="Start Date" value={form.startDate ?? ""} onValueChange={(v) => update("startDate", v)} required />
       <InputCurrency label="Salário base" value={form.baseSalary ?? ""} onValueChange={(v) => update("baseSalary", v)} emitAsDecimal />
       {error && <p className="text-sm font-medium text-error sm:col-span-2">{error}</p>}
-      <div className="flex flex-wrap gap-2 sm:col-span-2">
-        <Button type="submit" loading={saveMutation.isPending}>{isEditing ? "Salvar" : "Cadastrar"}</Button>
-        <Button type="button" variant="ghost" onClick={goToList}>Cancelar</Button>
-        {isEditing && <Button type="button" variant="outline" onClick={startCreate}>Novo</Button>}
-      </div>
-    </form>
+    </div>
+    </CrudFormShell>
   );
 }
